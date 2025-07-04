@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Empires</string>
+    <string name="buscar">Buscar</string>
+    <string name="sets">Sets</string>
+    <string name="_6h">6h</string>
+    <string name="_12h">12h</string>
+    <string name="_24h">24h</string>
+    <string name="weekly">Weekly</string>
+</resources>

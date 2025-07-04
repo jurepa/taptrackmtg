@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <AutoCompleteTextView
+        android:id="@+id/busquedaCartas"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="@string/buscar"
+        android:inputType="text"
+        android:layout_marginTop="50dp">
+
+    </AutoCompleteTextView>
+
+    <ImageView
+        android:id="@+id/cardImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/busquedaCartas"
+        android:layout_centerHorizontal="true"></ImageView>
+    <TextView
+        android:id="@+id/cardName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cardImage"
+        android:textColor="@color/black">
+    </TextView>
+    <TextView
+        android:id="@+id/typeLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cardName"
+        android:textColor="@color/black"
+        ></TextView>
+    <TextView
+        android:id="@+id/cardText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/typeLine"
+        android:textColor="@color/black">
+    </TextView>
+
+    <TextView
+        android:id="@+id/sets_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:layout_below="@id/cardText"
+        android:text="@string/sets" />
+
+    <Spinner
+        android:id="@+id/set"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sets_label"
+        android:layout_marginTop="10dp"
+        android:spinnerMode="dropdown"></Spinner>
+
+    <CheckBox
+        android:layout_below="@id/set"
+        android:text="check price?"
+        android:id="@+id/trackPriceCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"></CheckBox>
+
+    <TextView
+        android:id="@+id/oftenText"
+        android:visibility="invisible"
+        android:layout_below="@id/trackPriceCheck"
+        android:text="How often?"
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"></TextView>
+
+    <RadioGroup
+        android:visibility="invisible"
+        android:layout_below="@id/oftenText"
+        android:id="@+id/periodRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:text="@string/_6h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp">
+        </RadioButton>
+        <RadioButton
+            android:text="@string/_12h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp">
+        </RadioButton>
+        <RadioButton
+            android:text="@string/_24h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp">
+        </RadioButton>
+        <RadioButton
+            android:text="@string/weekly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </RadioButton>
+    </RadioGroup>
+
+
+</RelativeLayout>
