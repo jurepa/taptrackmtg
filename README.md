@@ -1,6 +1,6 @@
 # TaptrackMTG
 
-TaptrackMTG es una aplicación Android inspirada en [LifeTap](https://lifetapapp.com/) y Manabox, diseñada para jugadores de Magic: The Gathering. Permite principalmente dos cosas:
+TaptrackMTG es una aplicación Android inspirada en [LifeTap](https://play.google.com/store/apps/details?id=com.lifetap&hl=es_419&pli=1) y Manabox, diseñada para jugadores de Magic: The Gathering. Permite principalmente dos cosas:
 - Realizar búsquedas rápidas de cartas, guardar tus favoritas y realizar un seguimiento automático de los precios de mercado.
 - Monitorizar las vidas de las partidas, adaptable para todos los tipos de modos de juego y además con ayuda de ruling si surgen dudas sobre mecánicas durante la partida.
 
