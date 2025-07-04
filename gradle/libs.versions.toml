@@ -8,8 +8,9 @@ material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
 retrofit = "2.9.0"
-lombok = "1.18.32"
 picasso = "2.8"
+room = "2.7.2"
+drawerlayout = "1.2.0"
 
 
 [libraries]
@@ -22,8 +23,10 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 convertergson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
-lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
+room = {module="androidx.room:room-runtime", version.ref="room"}
+roomAnnotation = {module="androidx.room:room-compiler", version.ref="room"}
+
 
 
 

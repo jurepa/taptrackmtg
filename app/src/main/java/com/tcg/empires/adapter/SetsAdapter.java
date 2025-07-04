@@ -15,10 +15,6 @@ import java.util.List;
 public class SetsAdapter extends ArrayAdapter<ScryfallDetailCard> {
 
 
-    public SetsAdapter(@NonNull Context context, int resource, @NonNull ScryfallDetailCard[] objects) {
-        super(context, resource, objects);
-    }
-
     public SetsAdapter(@NonNull Context context, int resource, @NonNull List<ScryfallDetailCard> objects) {
         super(context, resource, objects);
     }
