@@ -18,6 +18,16 @@
 
     </AutoCompleteTextView>
 
+    <TextView
+        android:layout_below="@id/busquedaCartas"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/not_available"
+        android:visibility="invisible"
+        android:textColor="@color/black"
+        android:text="(Image not available)"
+        ></TextView>
     <ImageView
         android:id="@+id/cardImage"
         android:layout_width="wrap_content"

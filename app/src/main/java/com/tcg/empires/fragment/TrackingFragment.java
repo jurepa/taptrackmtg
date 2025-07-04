@@ -54,6 +54,7 @@ public class TrackingFragment extends Fragment {
     private RadioGroup oftenGroup;
     private CheckBox checkPrice;
     private TextView typeLine;
+    private TextView notAvailableText;
     private ArrayAdapter<String> cartas;
     private List<String> cardNames = new ArrayList<>();
 
@@ -80,6 +81,7 @@ public class TrackingFragment extends Fragment {
         checkPrice = view.findViewById(R.id.trackPriceCheck);
         oftenGroup = view.findViewById(R.id.periodRadioGroup);
         oftenText = view.findViewById(R.id.oftenText);
+        notAvailableText = view.findViewById(R.id.not_available);
         cartas = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, cardNames);
         cartas.setNotifyOnChange(true);
         buscador = view.findViewById(R.id.busquedaCartas);
@@ -175,10 +177,18 @@ public class TrackingFragment extends Fragment {
                 checkPrice.setChecked(false);
                 oftenGroup.clearCheck();
 
-                Picasso.get()
-                        .load(setSelected.getImageUris().getNormal())
-                        .error(R.drawable.ic_launcher_background)
-                        .into(cardImage);
+                if(setSelected.getImageUris() != null) {
+                    notAvailableText.setVisibility(INVISIBLE);
+                    cardImage.setVisibility(VISIBLE);
+                    Picasso.get()
+                            .load(setSelected.getImageUris().getNormal())
+                            .error(R.drawable.ic_launcher_background)
+                            .into(cardImage);
+                }else{
+                    cardImage.setVisibility(INVISIBLE);
+                    notAvailableText.setVisibility(VISIBLE);
+
+                }
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
