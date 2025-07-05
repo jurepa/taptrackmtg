@@ -3,14 +3,7 @@ package com.tcg.empires.fragment;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -27,8 +20,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.squareup.picasso.Picasso;
-import com.tcg.empires.MainActivity;
 import com.tcg.empires.R;
 import com.tcg.empires.adapter.SetsAdapter;
 import com.tcg.empires.model.ScryfallDetailCard;
@@ -37,6 +34,8 @@ import com.tcg.empires.viewmodel.CardDetailViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+
+//FIXME: APIKEY JUSTTCG tcg_0ec1354933154a4480cc34915a485bb8
 public class TrackingFragment extends Fragment {
 
     private CardDetailViewModel cardDetailViewModel;
