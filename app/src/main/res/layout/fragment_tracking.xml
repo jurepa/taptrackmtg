@@ -100,13 +100,15 @@
             android:text="@string/_6h"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:layout_marginEnd="10dp">
         </RadioButton>
         <RadioButton
             android:text="@string/_12h"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp">
+            android:layout_marginEnd="10dp"
+            android:enabled="false">
         </RadioButton>
         <RadioButton
             android:text="@string/_24h"
@@ -119,7 +121,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
         </RadioButton>
+        <RadioButton
+            android:text="@string/monthly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </RadioButton>
     </RadioGroup>
+
+    <Button
+        android:id="@+id/confirmTrackBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/periodRadioGroup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="@string/confirm"
+        android:visibility="invisible">
+    </Button>
 
 
 </RelativeLayout>

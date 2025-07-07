@@ -1,20 +1,33 @@
 package com.tcg.empires.viewmodel;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.room.Room;
 
 import com.tcg.empires.client.ScryfallClient;
 import com.tcg.empires.model.ScryfallAutocompleteResponse;
 import com.tcg.empires.model.ScryfallCardDetailList;
 import com.tcg.empires.model.ScryfallDetailCard;
+import com.tcg.empires.repository.TrackedCardRepository;
+import com.tcg.empires.room.TrackedCardEntity;
+import com.tcg.empires.room.dao.TrackedCardDao;
+import com.tcg.empires.room.db.TaptrackDatabase;
 import com.tcg.empires.service.ScryfallService;
+
+import java.util.function.Consumer;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CardDetailViewModel extends ViewModel {
+public class CardDetailViewModel extends AndroidViewModel {
+
+    private final TrackedCardRepository repository;
 
     private MutableLiveData<ScryfallAutocompleteResponse> autocomplete = new MutableLiveData<>();
 
@@ -34,6 +47,22 @@ public class CardDetailViewModel extends ViewModel {
         return autocomplete;
     }
 
+    public CardDetailViewModel(@NonNull Application application) {
+        super(application);
+        repository = new TrackedCardRepository(application);
+    }
+
+    public void insertCard(TrackedCardEntity card) {
+        repository.insert(card);
+    }
+
+    public void getCardById(int id, Consumer<TrackedCardEntity> callback) {
+        repository.getById(id, callback);
+    }
+
+    public void getCardByOracleIdAndSetCode(String oracleId, String setCode, Consumer<TrackedCardEntity> callback) {
+        repository.getByOracleIdAndSetCode(oracleId, setCode, callback);
+    }
     public void searchCards(String query){
         ScryfallService scryfallService = ScryfallClient.getScryfallService();
         Call<ScryfallAutocompleteResponse> call = scryfallService.getDropdownOptions(query);

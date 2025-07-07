@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -29,6 +30,9 @@ import com.squareup.picasso.Picasso;
 import com.tcg.empires.R;
 import com.tcg.empires.adapter.SetsAdapter;
 import com.tcg.empires.model.ScryfallDetailCard;
+import com.tcg.empires.room.TrackedCardEntity;
+import com.tcg.empires.room.dao.TrackedCardDao;
+import com.tcg.empires.room.db.DatabaseClient;
 import com.tcg.empires.viewmodel.CardDetailViewModel;
 
 import java.util.ArrayList;
@@ -39,21 +43,17 @@ import java.util.List;
 public class TrackingFragment extends Fragment {
 
     private CardDetailViewModel cardDetailViewModel;
-
     private AutoCompleteTextView buscador;
-
     private Spinner setsDropdown;
-
     private ImageView cardImage;
     private TextView cardName;
     private TextView cardText;
-
     private TextView oftenText;
-
     private RadioGroup oftenGroup;
     private CheckBox checkPrice;
     private TextView typeLine;
     private TextView notAvailableText;
+    private Button confirmTrackButton;
     private ArrayAdapter<String> cartas;
     private List<String> cardNames = new ArrayList<>();
 
@@ -81,6 +81,7 @@ public class TrackingFragment extends Fragment {
         oftenGroup = view.findViewById(R.id.periodRadioGroup);
         oftenText = view.findViewById(R.id.oftenText);
         notAvailableText = view.findViewById(R.id.not_available);
+        confirmTrackButton = view.findViewById(R.id.confirmTrackBtn);
         cartas = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, cardNames);
         cartas.setNotifyOnChange(true);
         buscador = view.findViewById(R.id.busquedaCartas);
@@ -202,9 +203,43 @@ public class TrackingFragment extends Fragment {
                     oftenText.setVisibility(VISIBLE);
                     oftenGroup.setVisibility(VISIBLE);
                 }else{
+                    oftenGroup.clearCheck();
                     oftenText.setVisibility(INVISIBLE);
                     oftenGroup.setVisibility(INVISIBLE);
+                    confirmTrackButton.setVisibility(INVISIBLE);
                 }
+            }
+        });
+
+        oftenGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId != -1) {
+                    confirmTrackButton.setVisibility(VISIBLE);
+                }
+            }
+        });
+
+        confirmTrackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               int radioButtonId = oftenGroup.getCheckedRadioButtonId();
+               ScryfallDetailCard detailCard = (ScryfallDetailCard) setsDropdown.getSelectedItem();
+
+                TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
+                trackedCardEntity.setOracleId(detailCard.getOracleId());
+                trackedCardEntity.setSetCode(detailCard.getSetId());
+                trackedCardEntity.setPeriod(radioButtonId);
+                if("".equals(detailCard.getPrices().getEur()) || detailCard.getPrices().getEur() == null) {
+                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getUsd()));
+                    trackedCardEntity.setSymbol("$");
+                }else{
+                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getEur()));
+                    trackedCardEntity.setSymbol("€");
+                }
+                cardDetailViewModel.insertCard(trackedCardEntity);
+                Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
+
             }
         });
         return view;

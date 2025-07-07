@@ -15,7 +15,7 @@ public interface TrackedCardDao {
 
     // Buscar por ID
     @Query("SELECT * FROM trackedCards WHERE id = :id")
-    TrackedCardEntity getById(String id);
+    TrackedCardEntity getById(int id);
 
     // Buscar por combinación de oracleId y setCode
     @Query("SELECT * FROM trackedCards WHERE oracleId = :oracleId AND setCode = :setCode")
