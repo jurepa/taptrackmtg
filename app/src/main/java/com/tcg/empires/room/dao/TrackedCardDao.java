@@ -6,6 +6,9 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.tcg.empires.room.TrackedCardEntity;
+
+import java.util.List;
+
 @Dao
 public interface TrackedCardDao {
 
@@ -23,6 +26,9 @@ public interface TrackedCardDao {
 
     @Query("DELETE FROM trackedCards WHERE oracleId = :oracleId AND setCode = :setCode")
     void stopTrackingByOracleIdAndSetCode(String oracleId, String setCode);
+
+    @Query("SELECT * FROM trackedCards WHERE period = :period")
+    List<TrackedCardEntity> getTrackedCardsByPeriod(int period);
 }
 
 

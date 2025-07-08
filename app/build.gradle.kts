@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.convertergson)
     implementation(libs.picasso)
     implementation(libs.room)
+    implementation(libs.work)
     annotationProcessor(libs.roomAnnotation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

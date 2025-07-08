@@ -14,10 +14,19 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.tcg.empires.fragment.LifetapFragment;
 import com.tcg.empires.fragment.TrackingFragment;
+import com.tcg.empires.worker.PriceCheckWorker;
+
+import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -53,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
+        enqueuePriceCheckWorks();
+
         navigationView.setNavigationItemSelectedListener(item -> {
             Fragment fragment = null;
             int itemId = item.getItemId();
@@ -75,5 +86,28 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void enqueuePriceCheckWorks() {
+        Constraints internetRequired = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
+        PeriodicWorkRequest priceCheckDaily = new PeriodicWorkRequest.Builder(PriceCheckWorker.class, 1, TimeUnit.DAYS).setInputData(new Data.Builder().putInt("period",3).build()).setConstraints(internetRequired).build();
+        PeriodicWorkRequest priceCheckWeekly = new PeriodicWorkRequest.Builder(PriceCheckWorker.class, 1, TimeUnit.DAYS).setInputData(new Data.Builder().putInt("period",4).build()).setConstraints(internetRequired).build();
+        PeriodicWorkRequest priceCheckMonthly = new PeriodicWorkRequest.Builder(PriceCheckWorker.class, 1, TimeUnit.DAYS).setInputData(new Data.Builder().putInt("period",5).build()).setConstraints(internetRequired).build();
+
+        WorkManager.getInstance(getApplicationContext()).enqueueUniquePeriodicWork(
+                "daily_check",
+                ExistingPeriodicWorkPolicy.KEEP,
+                priceCheckDaily
+        );
+        WorkManager.getInstance(getApplicationContext()).enqueueUniquePeriodicWork(
+                "weekly_check",
+                ExistingPeriodicWorkPolicy.KEEP,
+                priceCheckWeekly
+        );
+        WorkManager.getInstance(getApplicationContext()).enqueueUniquePeriodicWork(
+                "monthly_check",
+                ExistingPeriodicWorkPolicy.KEEP,
+                priceCheckMonthly
+        );
     }
 }

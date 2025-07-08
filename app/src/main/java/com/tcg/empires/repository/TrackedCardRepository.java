@@ -8,6 +8,7 @@ import com.tcg.empires.room.TrackedCardEntity;
 import com.tcg.empires.room.dao.TrackedCardDao;
 import com.tcg.empires.room.db.TaptrackDatabase;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -38,4 +39,12 @@ public class TrackedCardRepository {
             callback.accept(result);
         });
     }
+
+    public List<TrackedCardEntity> getTrackedCardsByPeriod(int period) {
+
+        return trackedCardDao.getTrackedCardsByPeriod(period);
+
+    }
+
+
 }
