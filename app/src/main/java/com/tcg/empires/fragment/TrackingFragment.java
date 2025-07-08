@@ -29,10 +29,12 @@ import androidx.lifecycle.ViewModelProvider;
 import com.squareup.picasso.Picasso;
 import com.tcg.empires.R;
 import com.tcg.empires.adapter.SetsAdapter;
+import com.tcg.empires.client.ScryfallClient;
 import com.tcg.empires.model.ScryfallDetailCard;
 import com.tcg.empires.room.TrackedCardEntity;
 import com.tcg.empires.room.dao.TrackedCardDao;
 import com.tcg.empires.room.db.DatabaseClient;
+import com.tcg.empires.service.ScryfallService;
 import com.tcg.empires.viewmodel.CardDetailViewModel;
 
 import java.util.ArrayList;
@@ -225,20 +227,24 @@ public class TrackingFragment extends Fragment {
             public void onClick(View v) {
                int radioButtonId = oftenGroup.getCheckedRadioButtonId();
                ScryfallDetailCard detailCard = (ScryfallDetailCard) setsDropdown.getSelectedItem();
-
                 TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
                 trackedCardEntity.setOracleId(detailCard.getOracleId());
-                trackedCardEntity.setSetCode(detailCard.getSetId());
+                trackedCardEntity.setSetCode(detailCard.getSet());
                 trackedCardEntity.setPeriod(radioButtonId);
-                if("".equals(detailCard.getPrices().getEur()) || detailCard.getPrices().getEur() == null) {
+                if(detailCard.getPrices().getUsd() != null && !detailCard.getPrices().getUsd().isEmpty()) {
                     trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getUsd()));
                     trackedCardEntity.setSymbol("$");
-                }else{
+                    cardDetailViewModel.insertCard(trackedCardEntity);
+                    Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
+                }else if(detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty()){
                     trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getEur()));
                     trackedCardEntity.setSymbol("€");
+                    cardDetailViewModel.insertCard(trackedCardEntity);
+                    Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(requireContext(), "Price not available for this print", Toast.LENGTH_SHORT).show();
                 }
-                cardDetailViewModel.insertCard(trackedCardEntity);
-                Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
+
 
             }
         });

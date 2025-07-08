@@ -4,6 +4,8 @@ import com.tcg.empires.model.ScryfallAutocompleteResponse;
 import com.tcg.empires.model.ScryfallCardDetailList;
 import com.tcg.empires.model.ScryfallDetailCard;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
@@ -31,4 +33,10 @@ public interface ScryfallService {
     })
     Call<ScryfallCardDetailList> getAllPrintsOfCardFromOracleId(@Query("order") String order, @Query("q") String oracleId, @Query("unique") String unique);
 
+    @GET("/cards/search")
+    @Headers({
+            "Accept: application/json",
+            "User-Agent: MTGExampleApp/1.0"
+    })
+    ScryfallCardDetailList searchCardsSync(@Query("order") String order, @Query("q") String oracleId, @Query("unique") String unique);
 }

@@ -27,7 +27,9 @@ public interface TrackedCardDao {
     @Query("DELETE FROM trackedCards WHERE oracleId = :oracleId AND setCode = :setCode")
     void stopTrackingByOracleIdAndSetCode(String oracleId, String setCode);
 
-    @Query("SELECT * FROM trackedCards WHERE period = :period")
+    @Query(
+            "    SELECT * FROM trackedCards" +
+            "    WHERE id IN (SELECT MAX(id) FROM trackedCards GROUP BY oracleId, setCode) and period= :period")
     List<TrackedCardEntity> getTrackedCardsByPeriod(int period);
 }
 
