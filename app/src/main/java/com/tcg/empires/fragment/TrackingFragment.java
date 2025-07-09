@@ -4,6 +4,7 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 import android.os.Bundle;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -39,6 +41,7 @@ import com.tcg.empires.viewmodel.CardDetailViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 
 //FIXME: APIKEY JUSTTCG tcg_0ec1354933154a4480cc34915a485bb8
@@ -175,9 +178,35 @@ public class TrackingFragment extends Fragment {
                 cardName.setText(String.format("Card name: %s", setSelected.getName()));
                 cardText.setText(String.format("Card text: %s", setSelected.getOracleText()));
                 typeLine.setText(String.format("Type line: %s", setSelected.getTypeLine()));
-                checkPrice.setVisibility(VISIBLE);
-                checkPrice.setChecked(false);
-                oftenGroup.clearCheck();
+                cardDetailViewModel.getCardByOracleIdAndSetCode(setSelected.getOracleId(), setSelected.getSet(), new Consumer<List<TrackedCardEntity>>() {
+                    @Override
+                    public void accept(List<TrackedCardEntity> trackedCardEntities) {
+                        requireActivity().runOnUiThread(() ->{
+                            checkPrice.setVisibility(VISIBLE);
+                            checkPrice.setChecked(false);
+                            oftenGroup.clearCheck();
+                            if(trackedCardEntities != null && !trackedCardEntities.isEmpty()){
+                                checkPrice.setEnabled(false);
+                                checkPrice.setChecked(true);
+                                oftenText.setVisibility(VISIBLE);
+                                oftenGroup.setVisibility(VISIBLE);
+                                oftenGroup.check(trackedCardEntities.get(0).getPeriod());
+                                for(int i = 3; i < oftenGroup.getChildCount(); i++){
+                                    ((RadioButton)oftenGroup.getChildAt(i)).setEnabled(false);
+                                }
+                                confirmTrackButton.setText(R.string.stop_tracking);
+                            }else{
+                                checkPrice.setEnabled(true);
+                                for(int i = 3; i < oftenGroup.getChildCount(); i++){
+                                    ((RadioButton)oftenGroup.getChildAt(i)).setEnabled(true);
+                                }
+                                confirmTrackButton.setText(R.string.track_price);
+                            }
+                        });
+                    }
+                });
+
+
 
                 if(setSelected.getImageUris() != null) {
                     notAvailableText.setVisibility(INVISIBLE);
@@ -227,23 +256,54 @@ public class TrackingFragment extends Fragment {
             public void onClick(View v) {
                int radioButtonId = oftenGroup.getCheckedRadioButtonId();
                ScryfallDetailCard detailCard = (ScryfallDetailCard) setsDropdown.getSelectedItem();
-                TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
-                trackedCardEntity.setOracleId(detailCard.getOracleId());
-                trackedCardEntity.setSetCode(detailCard.getSet());
-                trackedCardEntity.setPeriod(radioButtonId);
-                if(detailCard.getPrices().getUsd() != null && !detailCard.getPrices().getUsd().isEmpty()) {
-                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getUsd()));
-                    trackedCardEntity.setSymbol("$");
-                    cardDetailViewModel.insertCard(trackedCardEntity);
-                    Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
-                }else if(detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty()){
-                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getEur()));
-                    trackedCardEntity.setSymbol("€");
-                    cardDetailViewModel.insertCard(trackedCardEntity);
-                    Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
-                }else {
-                    Toast.makeText(requireContext(), "Price not available for this print", Toast.LENGTH_SHORT).show();
-                }
+               cardDetailViewModel.getCardByOracleIdAndSetCode(detailCard.getOracleId(), detailCard.getSet(), new Consumer<List<TrackedCardEntity>>() {
+                   @Override
+                   public void accept(List<TrackedCardEntity> trackedCardEntities) {
+
+                       requireActivity().runOnUiThread(() ->{
+                           if(trackedCardEntities != null && !trackedCardEntities.isEmpty()){
+                               cardDetailViewModel.stopTrackingByOracleIdAndSetCore(trackedCardEntities.get(0).getOracleId(), trackedCardEntities.get(0).getSetCode());
+                               checkPrice.setChecked(false);
+                               oftenGroup.clearCheck();
+                               confirmTrackButton.setText(R.string.track_price);
+                               checkPrice.setEnabled(true);
+                               for(int i = 3; i < oftenGroup.getChildCount(); i++){
+                                   ((RadioButton)oftenGroup.getChildAt(i)).setEnabled(true);
+                               }
+                               Toast.makeText(requireContext(), "You stopped tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
+                           }else{
+                               TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
+                               trackedCardEntity.setOracleId(detailCard.getOracleId());
+                               trackedCardEntity.setSetCode(detailCard.getSet());
+                               trackedCardEntity.setPeriod(radioButtonId);
+                               if(detailCard.getPrices().getUsd() != null && !detailCard.getPrices().getUsd().isEmpty()) {
+                                   trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getUsd()));
+                                   trackedCardEntity.setSymbol("$");
+                                   cardDetailViewModel.insertCard(trackedCardEntity);
+                                   Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
+                                   confirmTrackButton.setText(R.string.stop_tracking);
+                                   checkPrice.setEnabled(false);
+                                   for(int i = 3; i < oftenGroup.getChildCount(); i++){
+                                       ((RadioButton)oftenGroup.getChildAt(i)).setEnabled(false);
+                                   }
+                               }else if(detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty()){
+                                   trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getEur()));
+                                   trackedCardEntity.setSymbol("€");
+                                   cardDetailViewModel.insertCard(trackedCardEntity);
+                                   Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
+                                   confirmTrackButton.setText(R.string.stop_tracking);
+                                   for(int i = 3; i < oftenGroup.getChildCount(); i++){
+                                       ((RadioButton)oftenGroup.getChildAt(i)).setEnabled(false);
+                                   }
+                                   checkPrice.setEnabled(false);
+                               }else {
+                                   Toast.makeText(requireContext(), "Price not available for this print", Toast.LENGTH_SHORT).show();
+                               }
+                           }
+                       });
+                   }
+               });
+
 
 
             }

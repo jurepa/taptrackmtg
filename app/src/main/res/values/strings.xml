@@ -14,4 +14,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="monthly">Monthly</string>
     <string name="confirm">Confirm</string>
+    <string name="stop_tracking">STOP TRACKING</string>
+    <string name="track_price">TRACK PRICE</string>
+    <string name="image_not_available">(Image not available)</string>
+    <string name="how_often">How often?</string>
+    <string name="check_price">Check price?</string>
 </resources>

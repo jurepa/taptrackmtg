@@ -1,145 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
-    <RelativeLayout
-        android:id="@+id/fragment_tracking"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="5dp"
-        tools:context=".MainActivity">
+    android:fillViewport="true"
+    android:background="@color/background"
+    tools:context=".MainActivity">
 
-        <AutoCompleteTextView
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Buscador -->
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/busquedaCartas"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:hint="@string/buscar"
             android:inputType="text"
-            android:layout_marginTop="50dp">
+            android:backgroundTint="@color/primary"
+            app:boxBackgroundMode="filled"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-        </AutoCompleteTextView>
+        <!-- Card image -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardImageWrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardElevation="6dp"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintTop_toBottomOf="@id/busquedaCartas"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/cardImage"
+                android:layout_width="200dp"
+                android:layout_height="280dp"
+                android:scaleType="fitCenter" />
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
-            android:layout_below="@id/busquedaCartas"
-            android:layout_centerHorizontal="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/not_available"
-            android:visibility="invisible"
-            android:text="(Image not available)"
-            ></TextView>
-        <ImageView
-            android:id="@+id/cardImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/busquedaCartas"
-            android:layout_centerHorizontal="true"></ImageView>
+            android:text="@string/image_not_available"
+            android:textColor="@color/textSecondary"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/cardImageWrapper"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Card info -->
         <TextView
             android:id="@+id/cardName"
-            android:layout_width="wrap_content"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cardImage"
-            >
-        </TextView>
+            android:textColor="@color/textPrimary"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/not_available"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
         <TextView
             android:id="@+id/typeLine"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cardName"
+            android:textColor="@color/textSecondary"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            app:layout_constraintTop_toBottomOf="@id/cardName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-            ></TextView>
         <TextView
             android:id="@+id/cardText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/typeLine"
-            >
-        </TextView>
+            android:textColor="@color/textSecondary"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintTop_toBottomOf="@id/typeLine"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
+        <!-- Spinner de sets -->
         <TextView
             android:id="@+id/sets_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:layout_below="@id/cardText"
-            android:text="@string/sets" />
+            android:text="@string/sets"
+            style="@style/TextAppearance.Material3.TitleSmall"
+            app:layout_constraintTop_toBottomOf="@id/cardText"
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <Spinner
             android:id="@+id/set"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/sets_label"
-            android:layout_marginTop="10dp"
-            android:spinnerMode="dropdown"></Spinner>
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/sets_label"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <CheckBox
-            android:layout_below="@id/set"
-            android:text="check price?"
+        <!-- Checkbox -->
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/trackPriceCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="invisible"></CheckBox>
+            android:visibility="invisible"
+            android:text="@string/check_price"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/set"
+            app:layout_constraintStart_toStartOf="parent" />
 
+        <!-- Period label -->
         <TextView
             android:id="@+id/oftenText"
             android:visibility="invisible"
-            android:layout_below="@id/trackPriceCheck"
-            android:text="How often?"
-
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"></TextView>
-
-        <RadioGroup
-            android:visibility="invisible"
-            android:layout_below="@id/oftenText"
-            android:id="@+id/periodRadioGroup"
+            android:text="@string/how_often"
+            android:textColor="@color/textPrimary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <RadioButton
-                android:text="@string/_6h"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false">
-            </RadioButton>
-            <RadioButton
-                android:text="@string/_12h"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false">
-            </RadioButton>
-            <RadioButton
-                android:text="@string/_24h"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </RadioButton>
-            <RadioButton
-                android:text="@string/weekly"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </RadioButton>
-            <RadioButton
-                android:text="@string/monthly"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </RadioButton>
+            app:layout_constraintTop_toBottomOf="@id/trackPriceCheck"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="8dp" />
+
+        <!-- Radio buttons -->
+        <RadioGroup
+            android:id="@+id/periodRadioGroup"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/oftenText"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <RadioButton android:text="@string/_6h" android:enabled="false" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+            <RadioButton android:text="@string/_12h" android:enabled="false" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+            <RadioButton android:text="@string/_24h" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+            <RadioButton android:text="@string/weekly" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+            <RadioButton android:text="@string/monthly" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
         </RadioGroup>
 
-        <Button
+        <!-- Confirm button -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/confirmTrackBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/periodRadioGroup"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
             android:text="@string/confirm"
-            android:visibility="invisible">
-        </Button>
+            android:visibility="invisible"
+            android:layout_marginTop="16dp"
+            app:cornerRadius="12dp"
+            app:backgroundTint="@color/primary"
+            app:layout_constraintTop_toBottomOf="@id/periodRadioGroup"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    </RelativeLayout>
-</ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

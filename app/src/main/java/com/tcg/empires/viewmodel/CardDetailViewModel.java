@@ -19,6 +19,7 @@ import com.tcg.empires.room.dao.TrackedCardDao;
 import com.tcg.empires.room.db.TaptrackDatabase;
 import com.tcg.empires.service.ScryfallService;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import retrofit2.Call;
@@ -60,8 +61,12 @@ public class CardDetailViewModel extends AndroidViewModel {
         repository.getById(id, callback);
     }
 
-    public void getCardByOracleIdAndSetCode(String oracleId, String setCode, Consumer<TrackedCardEntity> callback) {
+    public void getCardByOracleIdAndSetCode(String oracleId, String setCode, Consumer<List<TrackedCardEntity>> callback) {
         repository.getByOracleIdAndSetCode(oracleId, setCode, callback);
+    }
+
+    public void stopTrackingByOracleIdAndSetCore(String oracleId, String setCode) {
+        repository.stopTrackingByOracleIdAndSetCore(oracleId, setCode);
     }
     public void searchCards(String query){
         ScryfallService scryfallService = ScryfallClient.getScryfallService();

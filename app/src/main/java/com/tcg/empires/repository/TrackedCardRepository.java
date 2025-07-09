@@ -33,10 +33,16 @@ public class TrackedCardRepository {
         });
     }
 
-    public void getByOracleIdAndSetCode(String oracleId, String setCode, Consumer<TrackedCardEntity> callback) {
+    public void getByOracleIdAndSetCode(String oracleId, String setCode, Consumer<List<TrackedCardEntity>> callback) {
         executor.execute(() -> {
-            TrackedCardEntity result = trackedCardDao.getByOracleIdAndSetCode(oracleId, setCode);
+            List<TrackedCardEntity> result = trackedCardDao.getByOracleIdAndSetCode(oracleId, setCode);
             callback.accept(result);
+        });
+    }
+
+    public void stopTrackingByOracleIdAndSetCore(String oracleId, String setCode) {
+        executor.execute(() -> {
+            trackedCardDao.stopTrackingByOracleIdAndSetCode(oracleId, setCode);
         });
     }
 
