@@ -119,7 +119,6 @@ public class PriceCheckWorker extends Worker {
             message = "La carta " + currentCard.getName() + " ha bajado su precio un " + percentage + "% y ahora vale " + currentPrice + lastTrackedEntity.getSymbol();
             builder.setContentText(message);
             notificationManager.notify((int)System.currentTimeMillis(), builder.build());
-
         }
 
         return notify;
