@@ -188,13 +188,13 @@ public class TrackingFragment extends Fragment {
                                 oftenText.setVisibility(VISIBLE);
                                 oftenGroup.setVisibility(VISIBLE);
                                 oftenGroup.check(trackedCardEntities.get(0).getPeriod());
-                                for(int i = 3; i < oftenGroup.getChildCount(); i++){
+                                for(int i = 2; i < oftenGroup.getChildCount(); i++){
                                     ((Chip)oftenGroup.getChildAt(i)).setEnabled(false);
                                 }
                                 confirmTrackButton.setText(R.string.stop_tracking);
                             }else{
                                 checkPrice.setEnabled(true);
-                                for(int i = 3; i < oftenGroup.getChildCount(); i++){
+                                for(int i = 2; i < oftenGroup.getChildCount(); i++){
                                     ((Chip)oftenGroup.getChildAt(i)).setEnabled(true);
                                 }
                                 confirmTrackButton.setText(R.string.track_price);
@@ -264,7 +264,7 @@ public class TrackingFragment extends Fragment {
                                oftenGroup.clearCheck();
                                confirmTrackButton.setText(R.string.track_price);
                                checkPrice.setEnabled(true);
-                               for(int i = 3; i < oftenGroup.getChildCount(); i++){
+                               for(int i = 2; i < oftenGroup.getChildCount(); i++){
                                    ((Chip)oftenGroup.getChildAt(i)).setEnabled(true);
                                }
                                Toast.makeText(requireContext(), "You stopped tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
@@ -280,7 +280,7 @@ public class TrackingFragment extends Fragment {
                                    Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
                                    confirmTrackButton.setText(R.string.stop_tracking);
                                    checkPrice.setEnabled(false);
-                                   for(int i = 3; i < oftenGroup.getChildCount(); i++){
+                                   for(int i = 2; i < oftenGroup.getChildCount(); i++){
                                        ((Chip)oftenGroup.getChildAt(i)).setEnabled(false);
                                    }
                                }else if(detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty()){
@@ -289,7 +289,7 @@ public class TrackingFragment extends Fragment {
                                    cardDetailViewModel.insertCard(trackedCardEntity);
                                    Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
                                    confirmTrackButton.setText(R.string.stop_tracking);
-                                   for(int i = 3; i < oftenGroup.getChildCount(); i++){
+                                   for(int i = 2; i < oftenGroup.getChildCount(); i++){
                                        ((Chip)oftenGroup.getChildAt(i)).setEnabled(false);
                                    }
                                    checkPrice.setEnabled(false);
