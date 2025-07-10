@@ -38,5 +38,5 @@ public interface ScryfallService {
             "Accept: application/json",
             "User-Agent: MTGExampleApp/1.0"
     })
-    ScryfallCardDetailList searchCardsSync(@Query("order") String order, @Query("q") String oracleId, @Query("unique") String unique);
+    Call<ScryfallCardDetailList> searchCardsSync(@Query("order") String order, @Query("q") String oracleId, @Query("unique") String unique);
 }

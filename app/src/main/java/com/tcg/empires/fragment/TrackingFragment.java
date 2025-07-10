@@ -28,6 +28,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.squareup.picasso.Picasso;
 import com.tcg.empires.R;
 import com.tcg.empires.adapter.SetsAdapter;
@@ -54,8 +57,8 @@ public class TrackingFragment extends Fragment {
     private TextView cardName;
     private TextView cardText;
     private TextView oftenText;
-    private RadioGroup oftenGroup;
-    private CheckBox checkPrice;
+    private ChipGroup oftenGroup;
+    private MaterialSwitch checkPrice;
     private TextView typeLine;
     private TextView notAvailableText;
     private Button confirmTrackButton;
@@ -83,7 +86,7 @@ public class TrackingFragment extends Fragment {
         cardText = view.findViewById(R.id.cardText);
         typeLine = view.findViewById(R.id.typeLine);
         checkPrice = view.findViewById(R.id.trackPriceCheck);
-        oftenGroup = view.findViewById(R.id.periodRadioGroup);
+        oftenGroup = view.findViewById(R.id.periodChipGroup);
         oftenText = view.findViewById(R.id.oftenText);
         notAvailableText = view.findViewById(R.id.not_available);
         confirmTrackButton = view.findViewById(R.id.confirmTrackBtn);
@@ -138,14 +141,8 @@ public class TrackingFragment extends Fragment {
         cardDetailViewModel.getCardDetail().observe(getViewLifecycleOwner(), scryfallDetailCard -> {
 
             if(scryfallDetailCard != null){
-                String imageUrl = scryfallDetailCard.getImageUris().getNormal();
 
                 cardDetailViewModel.getAllPrintsFromOracleId(scryfallDetailCard.getOracleId());
-
-                Picasso.get()
-                        .load(imageUrl)
-                        .error(R.drawable.ic_launcher_background)
-                        .into(cardImage);
 
             }else{
                 Toast.makeText(requireContext(), "Hubo un error consultando el detalle de la carta", Toast.LENGTH_SHORT).show();
@@ -192,13 +189,13 @@ public class TrackingFragment extends Fragment {
                                 oftenGroup.setVisibility(VISIBLE);
                                 oftenGroup.check(trackedCardEntities.get(0).getPeriod());
                                 for(int i = 3; i < oftenGroup.getChildCount(); i++){
-                                    ((RadioButton)oftenGroup.getChildAt(i)).setEnabled(false);
+                                    ((Chip)oftenGroup.getChildAt(i)).setEnabled(false);
                                 }
                                 confirmTrackButton.setText(R.string.stop_tracking);
                             }else{
                                 checkPrice.setEnabled(true);
                                 for(int i = 3; i < oftenGroup.getChildCount(); i++){
-                                    ((RadioButton)oftenGroup.getChildAt(i)).setEnabled(true);
+                                    ((Chip)oftenGroup.getChildAt(i)).setEnabled(true);
                                 }
                                 confirmTrackButton.setText(R.string.track_price);
                             }
@@ -242,10 +239,10 @@ public class TrackingFragment extends Fragment {
             }
         });
 
-        oftenGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        oftenGroup.setOnCheckedStateChangeListener(new ChipGroup.OnCheckedStateChangeListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(checkedId != -1) {
+            public void onCheckedChanged(@NonNull ChipGroup group, @NonNull List<Integer> checkedIds) {
+                if(!checkedIds.contains(-1)) {
                     confirmTrackButton.setVisibility(VISIBLE);
                 }
             }
@@ -254,7 +251,7 @@ public class TrackingFragment extends Fragment {
         confirmTrackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               int radioButtonId = oftenGroup.getCheckedRadioButtonId();
+               int radioButtonId = oftenGroup.getCheckedChipId();
                ScryfallDetailCard detailCard = (ScryfallDetailCard) setsDropdown.getSelectedItem();
                cardDetailViewModel.getCardByOracleIdAndSetCode(detailCard.getOracleId(), detailCard.getSet(), new Consumer<List<TrackedCardEntity>>() {
                    @Override
@@ -268,7 +265,7 @@ public class TrackingFragment extends Fragment {
                                confirmTrackButton.setText(R.string.track_price);
                                checkPrice.setEnabled(true);
                                for(int i = 3; i < oftenGroup.getChildCount(); i++){
-                                   ((RadioButton)oftenGroup.getChildAt(i)).setEnabled(true);
+                                   ((Chip)oftenGroup.getChildAt(i)).setEnabled(true);
                                }
                                Toast.makeText(requireContext(), "You stopped tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
                            }else{
@@ -284,7 +281,7 @@ public class TrackingFragment extends Fragment {
                                    confirmTrackButton.setText(R.string.stop_tracking);
                                    checkPrice.setEnabled(false);
                                    for(int i = 3; i < oftenGroup.getChildCount(); i++){
-                                       ((RadioButton)oftenGroup.getChildAt(i)).setEnabled(false);
+                                       ((Chip)oftenGroup.getChildAt(i)).setEnabled(false);
                                    }
                                }else if(detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty()){
                                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getEur()));
@@ -293,7 +290,7 @@ public class TrackingFragment extends Fragment {
                                    Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
                                    confirmTrackButton.setText(R.string.stop_tracking);
                                    for(int i = 3; i < oftenGroup.getChildCount(); i++){
-                                       ((RadioButton)oftenGroup.getChildAt(i)).setEnabled(false);
+                                       ((Chip)oftenGroup.getChildAt(i)).setEnabled(false);
                                    }
                                    checkPrice.setEnabled(false);
                                }else {

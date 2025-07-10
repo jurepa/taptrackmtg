@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
@@ -25,7 +26,10 @@ import com.tcg.empires.repository.TrackedCardRepository;
 import com.tcg.empires.room.TrackedCardEntity;
 import com.tcg.empires.service.ScryfallService;
 
+import java.io.IOException;
 import java.util.List;
+
+import retrofit2.Response;
 
 public class PriceCheckWorker extends Worker {
 
@@ -40,7 +44,7 @@ public class PriceCheckWorker extends Worker {
         String title = "¡Ojo a esta carta!";
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "PRICE_ALERTS")
-                .setSmallIcon(R.mipmap.ic_notification) // asegúrate de tener un icono válido
+                .setSmallIcon(R.mipmap.ic_notification)
                 .setContentTitle(title)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
@@ -55,41 +59,46 @@ public class PriceCheckWorker extends Worker {
         long oneMonthInMillis = 30L * 24 * 60 * 60 * 1000;
         long now = System.currentTimeMillis();
 
-        if(period == 3){
-            trackPricesAndNotify(period, builder);
-        }else if(period == 4 && (now - lastWeeklyRun >= oneWeekInMillis)){
-            trackPricesAndNotify(period, builder);
-            prefs.edit().putLong("last_weekly_check", now).apply();
-        }else if(period == 5 && (now - lastMonthlyRun >= oneMonthInMillis)){
-            trackPricesAndNotify(period, builder);
-            prefs.edit().putLong("last_monthly_check", now).apply();
+        try{
+            if(period == 3){
+                trackPricesAndNotify(period, builder);
+            }else if(period == 4 && (now - lastWeeklyRun >= oneWeekInMillis)){
+                trackPricesAndNotify(period, builder);
+                prefs.edit().putLong("last_weekly_check", now).apply();
+            }else if(period == 5 && (now - lastMonthlyRun >= oneMonthInMillis)){
+                trackPricesAndNotify(period, builder);
+                prefs.edit().putLong("last_monthly_check", now).apply();
+            }
+        }catch (IOException e){
+            Log.e("PriceCheckWorker", "Error al obtener la carta de scryfall: " + e);
         }
 
         return Result.success(); // o retry() o failure()
     }
 
-    private void trackPricesAndNotify(int period, NotificationCompat.Builder builder){
+    private void trackPricesAndNotify(int period, NotificationCompat.Builder builder) throws IOException {
 
         TrackedCardRepository trackedCardRepository = new TrackedCardRepository((Application) getApplicationContext());
         List<TrackedCardEntity> trackedCardsByPeriod = trackedCardRepository.getTrackedCardsByPeriod(period);
 
 
-        for(TrackedCardEntity entity : trackedCardsByPeriod) {
+        for(TrackedCardEntity lastTrackedEntity : trackedCardsByPeriod) {
             ScryfallService scryfallService = ScryfallClient.getScryfallService();
             String oracleId = "oracleId:";
             String setCode = " set:";
-            ScryfallCardDetailList card = scryfallService.searchCardsSync("released", oracleId.concat(entity.getOracleId()).concat(setCode).concat(entity.getSetCode()), "prints");
+            Response<ScryfallCardDetailList> response = scryfallService.searchCardsSync("released", oracleId.concat(lastTrackedEntity.getOracleId()).concat(setCode).concat(lastTrackedEntity.getSetCode()), "prints").execute();
+            ScryfallCardDetailList card = response.body();
             if(card != null && card.getData() != null && !card.getData().isEmpty()){
                 ScryfallDetailCard uniqueCard = card.getData().get(0);
                 TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
                 trackedCardEntity.setOracleId(uniqueCard.getOracleId());
                 trackedCardEntity.setSetCode(uniqueCard.getSet());
                 trackedCardEntity.setPeriod(period);
-                if(uniqueCard.getPrices().getUsd() != null && !uniqueCard.getPrices().getUsd().isEmpty()) {
+                if(lastTrackedEntity.getSymbol().equals("$") && uniqueCard.getPrices().getUsd() != null && !uniqueCard.getPrices().getUsd().isEmpty()) {
                     trackedCardEntity.setLastKnownPrice(Double.parseDouble(uniqueCard.getPrices().getUsd()));
                     trackedCardEntity.setSymbol("$");
                     trackedCardRepository.insert(trackedCardEntity);
-                }else if(uniqueCard.getPrices().getEur() != null && !uniqueCard.getPrices().getEur().isEmpty()){
+                }else if(lastTrackedEntity.getSymbol().equals("€") && uniqueCard.getPrices().getEur() != null && !uniqueCard.getPrices().getEur().isEmpty()){
                     trackedCardEntity.setLastKnownPrice(Double.parseDouble(uniqueCard.getPrices().getEur()));
                     trackedCardEntity.setSymbol("€");
                     trackedCardRepository.insert(trackedCardEntity);
