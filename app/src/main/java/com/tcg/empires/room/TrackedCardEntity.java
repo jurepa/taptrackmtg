@@ -7,7 +7,7 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 
-@Entity(tableName = "trackedCards", indices = {@Index(value = {"oracleId", "setCode"}, unique = true)})
+@Entity(tableName = "trackedCards", indices = {@Index(value = {"cardId"})})
 public class TrackedCardEntity {
 
     @PrimaryKey(autoGenerate = true)
@@ -15,10 +15,7 @@ public class TrackedCardEntity {
     private Integer id;
 
     @NonNull
-    private String oracleId;
-
-    @NonNull
-    private String setCode;
+    private String cardId;
 
     private int period;
 
@@ -31,6 +28,14 @@ public class TrackedCardEntity {
     @NonNull
     private String symbol;
 
+    @NonNull
+    public String getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(@NonNull String cardId) {
+        this.cardId = cardId;
+    }
 
     public int getPeriod() {
         return period;
@@ -64,24 +69,6 @@ public class TrackedCardEntity {
 
     public void setId(@NonNull Integer id) {
         this.id = id;
-    }
-
-    @NonNull
-    public String getOracleId() {
-        return oracleId;
-    }
-
-    public void setOracleId(@NonNull String oracleId) {
-        this.oracleId = oracleId;
-    }
-
-    @NonNull
-    public String getSetCode() {
-        return setCode;
-    }
-
-    public void setSetCode(@NonNull String setCode) {
-        this.setCode = setCode;
     }
 
     public double getLastKnownPrice() {

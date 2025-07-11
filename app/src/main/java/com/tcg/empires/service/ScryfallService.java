@@ -9,6 +9,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ScryfallService {
@@ -39,4 +40,11 @@ public interface ScryfallService {
             "User-Agent: MTGExampleApp/1.0"
     })
     Call<ScryfallCardDetailList> searchCardsSync(@Query("order") String order, @Query("q") String oracleId, @Query("unique") String unique);
+
+    @GET("/cards/{id}")
+    @Headers({
+            "Accept: application/json",
+            "User-Agent: MTGExampleApp/1.0"
+    })
+    Call<ScryfallDetailCard> searchCardsSyncById(@Path("id") String cardId);
 }

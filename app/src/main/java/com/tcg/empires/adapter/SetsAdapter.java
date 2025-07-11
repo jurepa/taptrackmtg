@@ -25,9 +25,21 @@ public class SetsAdapter extends ArrayAdapter<ScryfallDetailCard> {
         TextView textView = (TextView) view.findViewById(android.R.id.text1);
         ScryfallDetailCard scryfallDetailCard = getItem(position);
         String text = scryfallDetailCard.getSetName();
-        if(scryfallDetailCard.isFullArt() || scryfallDetailCard.getBorderColor().equals("borderless")){
-            text = text.concat(" (Extended/Full art)");
+        if(scryfallDetailCard.getFrameEffects() != null && !scryfallDetailCard.getFrameEffects().isEmpty()){
+            if(scryfallDetailCard.getFrameEffects().contains("etched")){
+                text = text.concat(" (Etched foil)");
+            } else if (scryfallDetailCard.getFrameEffects().contains("extendedart")) {
+                text = text.concat(" (Extended art)");
+            } else if (scryfallDetailCard.getFrameEffects().contains("shatteredglass")) {
+                text = text.concat(" (Shattered)");
+            }else if(scryfallDetailCard.getFrameEffects().contains("showcase")){
+                text = text.concat(" (Showcase frame)");
+            }else if(scryfallDetailCard.getFrameEffects().contains("inverted")){
+                text = text.concat(" (Alter art)");
+
+            }
         }
+
         textView.setText(text);
         return view;
     }
@@ -38,8 +50,19 @@ public class SetsAdapter extends ArrayAdapter<ScryfallDetailCard> {
         TextView textView = (TextView) view.findViewById(android.R.id.text1);
         ScryfallDetailCard scryfallDetailCard = getItem(position);
         String text = scryfallDetailCard.getSetName();
-        if(scryfallDetailCard.isFullArt() || scryfallDetailCard.getBorderColor().equals("borderless")){
-            text = text.concat(" (Extended/Full art)");
+        if(scryfallDetailCard.getFrameEffects() != null && !scryfallDetailCard.getFrameEffects().isEmpty()){
+            if(scryfallDetailCard.getFrameEffects().contains("etched")){
+                text = text.concat(" (Etched foil)");
+            } else if (scryfallDetailCard.getFrameEffects().contains("extendedart")) {
+                text = text.concat(" (Extended art)");
+            } else if (scryfallDetailCard.getFrameEffects().contains("shatteredglass")) {
+                text = text.concat(" (Shattered)");
+            }else if(scryfallDetailCard.getFrameEffects().contains("showcase")){
+                text = text.concat(" (Showcase frame)");
+            }else if(scryfallDetailCard.getFrameEffects().contains("inverted")){
+                text = text.concat(" (Alter art)");
+
+            }
         }
         textView.setText(text);
         return view;

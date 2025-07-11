@@ -126,6 +126,9 @@ public class ScryfallDetailCard {
 
     private String frame;
 
+    @SerializedName("frame_effects")
+    private List<String> frameEffects;
+
     @SerializedName("security_stamp")
     private String securityStamp;
 
@@ -151,6 +154,15 @@ public class ScryfallDetailCard {
 
     @SerializedName("purchase_uris")
     private PurchaseUris purchaseUris;
+
+
+    public List<String> getFrameEffects() {
+        return frameEffects;
+    }
+
+    public void setFrameEffects(List<String> frameEffects) {
+        this.frameEffects = frameEffects;
+    }
 
     public String getObject() {
         return object;

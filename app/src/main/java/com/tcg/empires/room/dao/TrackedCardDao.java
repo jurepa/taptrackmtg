@@ -22,15 +22,16 @@ public interface TrackedCardDao {
     TrackedCardEntity getById(int id);
 
     // Buscar por combinación de oracleId y setCode
-    @Query("SELECT * FROM trackedCards WHERE oracleId = :oracleId AND setCode = :setCode")
-    List<TrackedCardEntity> getByOracleIdAndSetCode(String oracleId, String setCode);
 
-    @Query("DELETE FROM trackedCards WHERE oracleId = :oracleId AND setCode = :setCode")
-    void stopTrackingByOracleIdAndSetCode(String oracleId, String setCode);
+    @Query("SELECT * FROM trackedCards WHERE cardId = :cardId")
+    List<TrackedCardEntity> getByCardId(String cardId);
+
+    @Query("DELETE FROM trackedCards WHERE cardId = :cardID")
+    void stopTrackingByCardID(String cardID);
 
     @Query(
             "    SELECT * FROM trackedCards" +
-            "    WHERE id IN (SELECT MAX(id) FROM trackedCards GROUP BY oracleId, setCode) and period= :period")
+            "    WHERE id IN (SELECT MAX(id) FROM trackedCards GROUP BY cardId) and period= :period")
     List<TrackedCardEntity> getTrackedCardsByPeriod(int period);
 }
 

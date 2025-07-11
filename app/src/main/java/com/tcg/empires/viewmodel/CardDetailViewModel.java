@@ -6,8 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import androidx.room.Room;
 
 import com.tcg.empires.client.ScryfallClient;
 import com.tcg.empires.model.ScryfallAutocompleteResponse;
@@ -15,8 +13,6 @@ import com.tcg.empires.model.ScryfallCardDetailList;
 import com.tcg.empires.model.ScryfallDetailCard;
 import com.tcg.empires.repository.TrackedCardRepository;
 import com.tcg.empires.room.TrackedCardEntity;
-import com.tcg.empires.room.dao.TrackedCardDao;
-import com.tcg.empires.room.db.TaptrackDatabase;
 import com.tcg.empires.service.ScryfallService;
 
 import java.util.List;
@@ -61,12 +57,12 @@ public class CardDetailViewModel extends AndroidViewModel {
         repository.getById(id, callback);
     }
 
-    public void getCardByOracleIdAndSetCode(String oracleId, String setCode, Consumer<List<TrackedCardEntity>> callback) {
-        repository.getByOracleIdAndSetCode(oracleId, setCode, callback);
+    public void getByCardId(String cardId, Consumer<List<TrackedCardEntity>> callback) {
+        repository.getByCardId(cardId, callback);
     }
 
-    public void stopTrackingByOracleIdAndSetCore(String oracleId, String setCode) {
-        repository.stopTrackingByOracleIdAndSetCore(oracleId, setCode);
+    public void stopTrackingByCardId(String cardId) {
+        repository.stopTrackingByCardId(cardId);
     }
     public void searchCards(String query){
         ScryfallService scryfallService = ScryfallClient.getScryfallService();

@@ -4,7 +4,6 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 import android.os.Bundle;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -14,11 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,17 +29,14 @@ import com.google.android.material.materialswitch.MaterialSwitch;
 import com.squareup.picasso.Picasso;
 import com.tcg.empires.R;
 import com.tcg.empires.adapter.SetsAdapter;
-import com.tcg.empires.client.ScryfallClient;
 import com.tcg.empires.model.ScryfallDetailCard;
 import com.tcg.empires.room.TrackedCardEntity;
-import com.tcg.empires.room.dao.TrackedCardDao;
-import com.tcg.empires.room.db.DatabaseClient;
-import com.tcg.empires.service.ScryfallService;
 import com.tcg.empires.viewmodel.CardDetailViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 
 //FIXME: APIKEY JUSTTCG tcg_0ec1354933154a4480cc34915a485bb8
@@ -152,7 +144,7 @@ public class TrackingFragment extends Fragment {
                 SetsAdapter spinnerAdapter = new SetsAdapter(
                         requireContext(),
                         android.R.layout.simple_spinner_item,
-                        scryfallCardDetailList.getData()
+                        scryfallCardDetailList.getData().stream().filter(scryfallDetailCard -> !(scryfallDetailCard.getGames().size() == 1 && scryfallDetailCard.getGames().contains("arena"))).collect(Collectors.toList())
                 );
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 setsDropdown.setAdapter(spinnerAdapter);
@@ -172,7 +164,7 @@ public class TrackingFragment extends Fragment {
                 cardName.setText(String.format("Card name: %s", setSelected.getName()));
                 cardText.setText(String.format("Card text: %s", setSelected.getOracleText()));
                 typeLine.setText(String.format("Type line: %s", setSelected.getTypeLine()));
-                cardDetailViewModel.getCardByOracleIdAndSetCode(setSelected.getOracleId(), setSelected.getSet(), new Consumer<List<TrackedCardEntity>>() {
+                cardDetailViewModel.getByCardId(setSelected.getId(), new Consumer<List<TrackedCardEntity>>() {
                     @Override
                     public void accept(List<TrackedCardEntity> trackedCardEntities) {
                         requireActivity().runOnUiThread(() ->{
@@ -244,13 +236,13 @@ public class TrackingFragment extends Fragment {
         confirmTrackButton.setOnClickListener(v -> {
            int radioButtonId = oftenGroup.getCheckedChipId();
            ScryfallDetailCard detailCard = (ScryfallDetailCard) setsDropdown.getSelectedItem();
-           cardDetailViewModel.getCardByOracleIdAndSetCode(detailCard.getOracleId(), detailCard.getSet(), new Consumer<>() {
+           cardDetailViewModel.getByCardId(detailCard.getId(), new Consumer<>() {
                @Override
                public void accept(List<TrackedCardEntity> trackedCardEntities) {
 
                    requireActivity().runOnUiThread(() -> {
                        if (trackedCardEntities != null && !trackedCardEntities.isEmpty()) {
-                           cardDetailViewModel.stopTrackingByOracleIdAndSetCore(trackedCardEntities.get(0).getOracleId(), trackedCardEntities.get(0).getSetCode());
+                           cardDetailViewModel.stopTrackingByCardId(trackedCardEntities.get(0).getCardId());
                            checkPrice.setChecked(false);
                            oftenGroup.clearCheck();
                            confirmTrackButton.setText(R.string.track_price);
@@ -261,20 +253,9 @@ public class TrackingFragment extends Fragment {
                            Toast.makeText(requireContext(), "You stopped tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
                        } else {
                            TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
-                           trackedCardEntity.setOracleId(detailCard.getOracleId());
-                           trackedCardEntity.setSetCode(detailCard.getSet());
+                           trackedCardEntity.setCardId(detailCard.getId());
                            trackedCardEntity.setPeriod(radioButtonId);
-                           if (detailCard.getPrices().getUsd() != null && !detailCard.getPrices().getUsd().isEmpty()) {
-                               trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getUsd()));
-                               trackedCardEntity.setSymbol("$");
-                               cardDetailViewModel.insertCard(trackedCardEntity);
-                               Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
-                               confirmTrackButton.setText(R.string.stop_tracking);
-                               checkPrice.setEnabled(false);
-                               for (int i = 2; i < oftenGroup.getChildCount(); i++) {
-                                   ((Chip) oftenGroup.getChildAt(i)).setEnabled(false);
-                               }
-                           } else if (detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty()) {
+                           if (detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty()) {
                                trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getEur()));
                                trackedCardEntity.setSymbol("€");
                                cardDetailViewModel.insertCard(trackedCardEntity);
@@ -284,7 +265,27 @@ public class TrackingFragment extends Fragment {
                                    ((Chip) oftenGroup.getChildAt(i)).setEnabled(false);
                                }
                                checkPrice.setEnabled(false);
-                           } else {
+                           } else if (detailCard.getPrices().getUsd() != null && !detailCard.getPrices().getUsd().isEmpty()) {
+                               trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getUsd()));
+                               trackedCardEntity.setSymbol("$");
+                               cardDetailViewModel.insertCard(trackedCardEntity);
+                               Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
+                               confirmTrackButton.setText(R.string.stop_tracking);
+                               checkPrice.setEnabled(false);
+                               for (int i = 2; i < oftenGroup.getChildCount(); i++) {
+                                   ((Chip) oftenGroup.getChildAt(i)).setEnabled(false);
+                               }
+                           } else if(detailCard.getFrameEffects() != null && detailCard.getFrameEffects().contains("etched") && !detailCard.getPrices().getUsdEtched().isEmpty()){
+                               trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getUsd()));
+                               trackedCardEntity.setSymbol("$");
+                               cardDetailViewModel.insertCard(trackedCardEntity);
+                               Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
+                               confirmTrackButton.setText(R.string.stop_tracking);
+                               checkPrice.setEnabled(false);
+                               for (int i = 2; i < oftenGroup.getChildCount(); i++) {
+                                   ((Chip) oftenGroup.getChildAt(i)).setEnabled(false);
+                               }
+                           }else {
                                Toast.makeText(requireContext(), "Price not available for this print", Toast.LENGTH_SHORT).show();
                            }
                        }

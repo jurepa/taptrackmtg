@@ -84,28 +84,25 @@ public class PriceCheckWorker extends Worker {
 
         for(TrackedCardEntity lastTrackedEntity : trackedCardsByPeriod) {
             ScryfallService scryfallService = ScryfallClient.getScryfallService();
-            String oracleId = "oracleId:";
-            String setCode = " set:";
-            Response<ScryfallCardDetailList> response = scryfallService.searchCardsSync("released", oracleId.concat(lastTrackedEntity.getOracleId()).concat(setCode).concat(lastTrackedEntity.getSetCode()), "prints").execute();
-            ScryfallCardDetailList card = response.body();
-            if(card != null && card.getData() != null && !card.getData().isEmpty()){
-                ScryfallDetailCard uniqueCard = card.getData().get(0);
+            Response<ScryfallDetailCard> response = scryfallService.searchCardsSyncById(lastTrackedEntity.getCardId()).execute();
+            ScryfallDetailCard card = response.body();
+            if(card != null ){
                 TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
-                trackedCardEntity.setOracleId(uniqueCard.getOracleId());
-                trackedCardEntity.setSetCode(uniqueCard.getSet());
+                trackedCardEntity.setCardId(card.getId());
                 trackedCardEntity.setPeriod(period);
-                if(lastTrackedEntity.getSymbol().equals("$") && uniqueCard.getPrices().getUsd() != null && !uniqueCard.getPrices().getUsd().isEmpty()) {
-                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(uniqueCard.getPrices().getUsd()));
+                if(lastTrackedEntity.getSymbol().equals("$") && card.getPrices().getUsd() != null && !card.getPrices().getUsd().isEmpty()) {
+                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(card.getPrices().getUsd()));
                     trackedCardEntity.setSymbol("$");
                     trackedCardRepository.insert(trackedCardEntity);
-                }else if(lastTrackedEntity.getSymbol().equals("€") && uniqueCard.getPrices().getEur() != null && !uniqueCard.getPrices().getEur().isEmpty()){
-                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(uniqueCard.getPrices().getEur()));
+                }else if(lastTrackedEntity.getSymbol().equals("€") && card.getPrices().getEur() != null && !card.getPrices().getEur().isEmpty()){
+                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(card.getPrices().getEur()));
                     trackedCardEntity.setSymbol("€");
                     trackedCardRepository.insert(trackedCardEntity);
                 }
 
-                notify(trackedCardEntity, uniqueCard, builder);
-
+                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                    notify(trackedCardEntity, card, builder);
+                }
             }
         }
     }
