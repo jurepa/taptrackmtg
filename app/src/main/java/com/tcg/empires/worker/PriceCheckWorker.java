@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
@@ -18,6 +19,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.google.android.material.chip.Chip;
 import com.tcg.empires.R;
 import com.tcg.empires.client.ScryfallClient;
 import com.tcg.empires.model.ScryfallCardDetailList;
@@ -90,13 +92,19 @@ public class PriceCheckWorker extends Worker {
                 TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
                 trackedCardEntity.setCardId(card.getId());
                 trackedCardEntity.setPeriod(period);
-                if(lastTrackedEntity.getSymbol().equals("$") && card.getPrices().getUsd() != null && !card.getPrices().getUsd().isEmpty()) {
-                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(card.getPrices().getUsd()));
+                if(lastTrackedEntity.getSymbol().equals("$") && (card.getPrices().getUsd() != null && !card.getPrices().getUsd().isEmpty())
+                        || (lastTrackedEntity.isFoil() && card.getPrices().getUsdFoil() != null && !card.getPrices().getUsdFoil().isEmpty())) {
+                    trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getEur()) : Double.parseDouble(card.getPrices().getEurFoil()));
                     trackedCardEntity.setSymbol("$");
                     trackedCardRepository.insert(trackedCardEntity);
-                }else if(lastTrackedEntity.getSymbol().equals("€") && card.getPrices().getEur() != null && !card.getPrices().getEur().isEmpty()){
-                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(card.getPrices().getEur()));
+                }else if(lastTrackedEntity.getSymbol().equals("€") && (card.getPrices().getEur() != null && !card.getPrices().getEur().isEmpty())
+                        || (lastTrackedEntity.isFoil() && card.getPrices().getEurFoil() != null && !card.getPrices().getEurFoil().isEmpty())){
+                    trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getUsd()) : Double.parseDouble(card.getPrices().getUsdFoil()));
                     trackedCardEntity.setSymbol("€");
+                    trackedCardRepository.insert(trackedCardEntity);
+                } else if(card.getFrameEffects() != null && card.getFrameEffects().contains("etched") && !card.getPrices().getUsdEtched().isEmpty()) {
+                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(card.getPrices().getUsdEtched()));
+                    trackedCardEntity.setSymbol("$");
                     trackedCardRepository.insert(trackedCardEntity);
                 }
 

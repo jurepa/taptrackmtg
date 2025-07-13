@@ -1,5 +1,6 @@
 package com.tcg.empires.fragment;
 
+import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
@@ -9,10 +10,13 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -46,11 +50,13 @@ public class TrackingFragment extends Fragment {
     private AutoCompleteTextView buscador;
     private Spinner setsDropdown;
     private ImageView cardImage;
+    private ImageView glowOverlay;
     private TextView cardName;
     private TextView cardText;
     private TextView oftenText;
     private ChipGroup oftenGroup;
     private MaterialSwitch checkPrice;
+    private MaterialSwitch foilSwitch;
     private TextView typeLine;
     private TextView notAvailableText;
     private Button confirmTrackButton;
@@ -82,6 +88,8 @@ public class TrackingFragment extends Fragment {
         oftenText = view.findViewById(R.id.oftenText);
         notAvailableText = view.findViewById(R.id.not_available);
         confirmTrackButton = view.findViewById(R.id.confirmTrackBtn);
+        foilSwitch = view.findViewById(R.id.foilSwitch);
+        glowOverlay = view.findViewById(R.id.glowOverlay);
         cartas = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, cardNames);
         cartas.setNotifyOnChange(true);
         buscador = view.findViewById(R.id.busquedaCartas);
@@ -169,11 +177,24 @@ public class TrackingFragment extends Fragment {
                     public void accept(List<TrackedCardEntity> trackedCardEntities) {
                         requireActivity().runOnUiThread(() ->{
                             checkPrice.setVisibility(VISIBLE);
+                            foilSwitch.setVisibility(VISIBLE);
                             checkPrice.setChecked(false);
                             oftenGroup.clearCheck();
+                            if((setSelected.isFoil() && !setSelected.isNonfoil()) || (setSelected.getFrameEffects() != null && setSelected.getFrameEffects().contains("etched"))){
+                                foilSwitch.setChecked(true);
+                                foilSwitch.setEnabled(false);
+                            }else if(!setSelected.isFoil() && setSelected.isNonfoil()){
+                                foilSwitch.setChecked(false);
+                                foilSwitch.setEnabled(false);
+                            }else {
+                                foilSwitch.setChecked(false);
+                                foilSwitch.setEnabled(true);
+                            }
                             if(trackedCardEntities != null && !trackedCardEntities.isEmpty()){
                                 checkPrice.setEnabled(false);
                                 checkPrice.setChecked(true);
+                                foilSwitch.setEnabled(false);
+                                foilSwitch.setChecked(trackedCardEntities.get(0).isFoil());
                                 oftenText.setVisibility(VISIBLE);
                                 oftenGroup.setVisibility(VISIBLE);
                                 oftenGroup.check(trackedCardEntities.get(0).getPeriod());
@@ -210,6 +231,21 @@ public class TrackingFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 checkPrice.setVisibility(INVISIBLE);
+                foilSwitch.setVisibility(INVISIBLE);
+            }
+        });
+
+        foilSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    Animation foilAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.foil);
+                    glowOverlay.startAnimation(foilAnim);
+                    glowOverlay.setVisibility(VISIBLE);
+                }else {
+                    glowOverlay.clearAnimation();
+                    glowOverlay.setVisibility(GONE);
+                }
             }
         });
 
@@ -247,6 +283,17 @@ public class TrackingFragment extends Fragment {
                            oftenGroup.clearCheck();
                            confirmTrackButton.setText(R.string.track_price);
                            checkPrice.setEnabled(true);
+                           if((detailCard.isFoil() && !detailCard.isNonfoil()) || (detailCard.getFrameEffects() != null && detailCard.getFrameEffects().contains("etched"))){
+                               foilSwitch.setChecked(true);
+                               foilSwitch.setEnabled(false);
+                           }else if(!detailCard.isFoil() && detailCard.isNonfoil()){
+                               foilSwitch.setChecked(false);
+                               foilSwitch.setEnabled(false);
+                           }else {
+                               foilSwitch.setChecked(false);
+                               foilSwitch.setEnabled(true);
+                           }
+
                            for (int i = 2; i < oftenGroup.getChildCount(); i++) {
                                ((Chip) oftenGroup.getChildAt(i)).setEnabled(true);
                            }
@@ -255,8 +302,10 @@ public class TrackingFragment extends Fragment {
                            TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
                            trackedCardEntity.setCardId(detailCard.getId());
                            trackedCardEntity.setPeriod(radioButtonId);
-                           if (detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty()) {
-                               trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getEur()));
+                           trackedCardEntity.setFoil(foilSwitch.isChecked());
+                           if ((detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty())
+                           || (foilSwitch.isChecked() && detailCard.getPrices().getEurFoil() != null && !detailCard.getPrices().getEurFoil().isEmpty())) {
+                               trackedCardEntity.setLastKnownPrice(!foilSwitch.isChecked() ? Double.parseDouble(detailCard.getPrices().getEur()) : Double.parseDouble(detailCard.getPrices().getEurFoil()));
                                trackedCardEntity.setSymbol("€");
                                cardDetailViewModel.insertCard(trackedCardEntity);
                                Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
@@ -265,23 +314,27 @@ public class TrackingFragment extends Fragment {
                                    ((Chip) oftenGroup.getChildAt(i)).setEnabled(false);
                                }
                                checkPrice.setEnabled(false);
-                           } else if (detailCard.getPrices().getUsd() != null && !detailCard.getPrices().getUsd().isEmpty()) {
-                               trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getUsd()));
+                               foilSwitch.setEnabled(false);
+                           } else if ((detailCard.getPrices().getUsd() != null && !detailCard.getPrices().getUsd().isEmpty())
+                           || (foilSwitch.isChecked() && detailCard.getPrices().getUsdFoil() != null && !detailCard.getPrices().getUsdFoil().isEmpty())) {
+                               trackedCardEntity.setLastKnownPrice(!foilSwitch.isChecked() ? Double.parseDouble(detailCard.getPrices().getUsd()) : Double.parseDouble(detailCard.getPrices().getUsdFoil()));
                                trackedCardEntity.setSymbol("$");
                                cardDetailViewModel.insertCard(trackedCardEntity);
                                Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
                                confirmTrackButton.setText(R.string.stop_tracking);
                                checkPrice.setEnabled(false);
+                               foilSwitch.setEnabled(false);
                                for (int i = 2; i < oftenGroup.getChildCount(); i++) {
                                    ((Chip) oftenGroup.getChildAt(i)).setEnabled(false);
                                }
                            } else if(detailCard.getFrameEffects() != null && detailCard.getFrameEffects().contains("etched") && !detailCard.getPrices().getUsdEtched().isEmpty()){
-                               trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getUsd()));
+                               trackedCardEntity.setLastKnownPrice(Double.parseDouble(detailCard.getPrices().getUsdEtched()));
                                trackedCardEntity.setSymbol("$");
                                cardDetailViewModel.insertCard(trackedCardEntity);
                                Toast.makeText(requireContext(), "Tracking " + detailCard.getName() + "!", Toast.LENGTH_SHORT).show();
                                confirmTrackButton.setText(R.string.stop_tracking);
                                checkPrice.setEnabled(false);
+                               foilSwitch.setEnabled(false);
                                for (int i = 2; i < oftenGroup.getChildCount(); i++) {
                                    ((Chip) oftenGroup.getChildAt(i)).setEnabled(false);
                                }

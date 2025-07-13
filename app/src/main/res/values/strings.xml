@@ -19,4 +19,5 @@
     <string name="image_not_available">(Image not available)</string>
     <string name="how_often">How often?</string>
     <string name="check_price">Track price?</string>
+    <string name="foil">Foil</string>
 </resources>

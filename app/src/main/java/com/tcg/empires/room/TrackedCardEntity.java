@@ -19,8 +19,8 @@ public class TrackedCardEntity {
 
     private int period;
 
-    @Nullable
-    private String condition;
+    @NonNull
+    private boolean foil;
 
     @NonNull
     private double lastKnownPrice;
@@ -54,12 +54,12 @@ public class TrackedCardEntity {
         this.symbol = symbol;
     }
 
-    public String getCondition() {
-        return condition;
+    public boolean isFoil() {
+        return foil;
     }
 
-    public void setCondition(String condition) {
-        this.condition = condition;
+    public void setFoil(boolean foil) {
+        this.foil = foil;
     }
 
     @NonNull
