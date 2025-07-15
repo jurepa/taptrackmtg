@@ -46,6 +46,13 @@ public class TrackedCardRepository {
         });
     }
 
+    public void getTrackedCards(Consumer<List<TrackedCardEntity>> callback) {
+        executor.execute(() -> {
+            List<TrackedCardEntity> result = trackedCardDao.getTrackedCards();
+            callback.accept(result);
+        });
+    }
+
     public List<TrackedCardEntity> getTrackedCardsByPeriod(int period) {
 
         return trackedCardDao.getTrackedCardsByPeriod(period);

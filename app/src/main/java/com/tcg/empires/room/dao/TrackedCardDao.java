@@ -33,6 +33,11 @@ public interface TrackedCardDao {
             "    SELECT * FROM trackedCards" +
             "    WHERE id IN (SELECT MAX(id) FROM trackedCards GROUP BY cardId) and period= :period")
     List<TrackedCardEntity> getTrackedCardsByPeriod(int period);
+
+    @Query(
+            "    SELECT * FROM trackedCards" +
+                    "    WHERE id IN (SELECT MAX(id) FROM trackedCards GROUP BY cardId)")
+    List<TrackedCardEntity> getTrackedCards();
 }
 
 

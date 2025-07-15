@@ -7,6 +7,7 @@ import static android.view.View.VISIBLE;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public class TrackingFragment extends Fragment {
 
     private CardDetailViewModel cardDetailViewModel;
     private AutoCompleteTextView buscador;
+    private TextView setLabel;
     private Spinner setsDropdown;
     private ImageView cardImage;
     private ImageView glowOverlay;
@@ -60,6 +62,9 @@ public class TrackingFragment extends Fragment {
     private TextView typeLine;
     private TextView notAvailableText;
     private Button confirmTrackButton;
+    private Chip dailyChip;
+    private Chip weeklyChip;
+    private Chip monthlyChip;
     private ArrayAdapter<String> cartas;
     private List<String> cardNames = new ArrayList<>();
 
@@ -80,12 +85,16 @@ public class TrackingFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_tracking, container, false);
         cardImage = view.findViewById(R.id.cardImage);
         setsDropdown = view.findViewById(R.id.set);
+        setLabel = view.findViewById(R.id.sets_label);
         cardName = view.findViewById(R.id.cardName);
         cardText = view.findViewById(R.id.cardText);
         typeLine = view.findViewById(R.id.typeLine);
         checkPrice = view.findViewById(R.id.trackPriceCheck);
         oftenGroup = view.findViewById(R.id.periodChipGroup);
         oftenText = view.findViewById(R.id.oftenText);
+        dailyChip = view.findViewById(R.id.daily);
+        weeklyChip = view.findViewById(R.id.weekly);
+        monthlyChip = view.findViewById(R.id.monthly);
         notAvailableText = view.findViewById(R.id.not_available);
         confirmTrackButton = view.findViewById(R.id.confirmTrackBtn);
         foilSwitch = view.findViewById(R.id.foilSwitch);
@@ -119,6 +128,8 @@ public class TrackingFragment extends Fragment {
             buscador.dismissDropDown();
             String text = buscador.getText().toString();
             cardDetailViewModel.searchByExactName(text);
+            setsDropdown.setVisibility(VISIBLE);
+            setLabel.setVisibility(VISIBLE);
         });
 
         cardDetailViewModel.getAutocomplete().observe(getViewLifecycleOwner(), cardList -> {
@@ -197,10 +208,11 @@ public class TrackingFragment extends Fragment {
                                 foilSwitch.setChecked(trackedCardEntities.get(0).isFoil());
                                 oftenText.setVisibility(VISIBLE);
                                 oftenGroup.setVisibility(VISIBLE);
-                                oftenGroup.check(trackedCardEntities.get(0).getPeriod());
+                                oftenGroup.setEnabled(false);
                                 for(int i = 2; i < oftenGroup.getChildCount(); i++){
                                     ((Chip)oftenGroup.getChildAt(i)).setEnabled(false);
                                 }
+                                checkChip(trackedCardEntities.get(0).getPeriod());
                                 confirmTrackButton.setText(R.string.stop_tracking);
                             }else{
                                 checkPrice.setEnabled(true);
@@ -301,7 +313,10 @@ public class TrackingFragment extends Fragment {
                        } else {
                            TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
                            trackedCardEntity.setCardId(detailCard.getId());
-                           trackedCardEntity.setPeriod(radioButtonId);
+                           trackedCardEntity.setImageUrl(detailCard.getImageUris().getSmall());
+                           trackedCardEntity.setCardName(detailCard.getName());
+                           trackedCardEntity.setSetName(detailCard.getSetName());
+                           trackedCardEntity.setPeriod(getPeriodNumber(radioButtonId));
                            trackedCardEntity.setFoil(foilSwitch.isChecked());
                            if ((detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty())
                            || (foilSwitch.isChecked() && detailCard.getPrices().getEurFoil() != null && !detailCard.getPrices().getEurFoil().isEmpty())) {
@@ -350,6 +365,29 @@ public class TrackingFragment extends Fragment {
 
         });
         return view;
+    }
+
+    private void checkChip(int period) {
+        switch (period){
+            case 3: dailyChip.setChecked(true);
+                break;
+            case 4: weeklyChip.setChecked(true);
+                break;
+            case 5:monthlyChip.setChecked(true);
+                break;
+        }
+    }
+
+    private int getPeriodNumber(int chipId){
+        int period = 0;
+        if(chipId == R.id.daily){
+            period = 3;
+        } else if (chipId == R.id.weekly) {
+            period = 4;
+        }else{
+            period = 5;
+        }
+        return period;
     }
 
 }

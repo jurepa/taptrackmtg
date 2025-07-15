@@ -111,12 +111,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sets"
+            android:visibility="invisible"
             style="@style/TextAppearance.Material3.TitleSmall"
             app:layout_constraintTop_toBottomOf="@id/cardText"
             app:layout_constraintStart_toStartOf="parent"/>
 
         <Spinner
             android:id="@+id/set"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -170,6 +172,7 @@
             app:singleSelection="true">
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/six"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:enabled="false"
@@ -177,6 +180,7 @@
                 style="@style/Widget.Material3.Chip.Filter" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/twelve"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:enabled="false"
@@ -184,18 +188,21 @@
                 style="@style/Widget.Material3.Chip.Filter" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/daily"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/_24h"
                 style="@style/Widget.Material3.Chip.Filter" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/weekly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/weekly"
                 style="@style/Widget.Material3.Chip.Filter" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/monthly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/monthly"

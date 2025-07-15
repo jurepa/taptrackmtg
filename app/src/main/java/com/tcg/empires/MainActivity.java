@@ -19,6 +19,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.work.Configuration;
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
@@ -27,7 +28,9 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.google.android.material.navigation.NavigationView;
+import com.squareup.picasso.Picasso;
 import com.tcg.empires.fragment.LifetapFragment;
+import com.tcg.empires.fragment.TrackedCardsFragment;
 import com.tcg.empires.fragment.TrackingFragment;
 import com.tcg.empires.worker.PriceCheckWorker;
 
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         drawerToggle.syncState();
 
         enqueuePriceCheckWorks();
+        Picasso.setSingletonInstance(new Picasso.Builder(getApplicationContext()).build());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -89,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_lifetap) {
                 Toast.makeText(this, "Lifetap", Toast.LENGTH_SHORT).show();
                 fragment = LifetapFragment.newInstance();
+            } else if (itemId == R.id.nav_trackedcards) {
+                fragment = TrackedCardsFragment.newInstance();
             }
 
             if (fragment != null) {
@@ -105,6 +111,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void enqueuePriceCheckWorks() {
+        if(!WorkManager.isInitialized()) {
+            WorkManager.initialize(this, new Configuration.Builder().build());
+        }
         Constraints internetRequired = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
         PeriodicWorkRequest priceCheckDaily = new PeriodicWorkRequest.Builder(PriceCheckWorker.class, 1, TimeUnit.DAYS).setInputData(new Data.Builder().putInt("period",3).build()).setConstraints(internetRequired).build();
         PeriodicWorkRequest priceCheckWeekly = new PeriodicWorkRequest.Builder(PriceCheckWorker.class, 1, TimeUnit.DAYS).setInputData(new Data.Builder().putInt("period",4).build()).setConstraints(internetRequired).build();
@@ -112,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
         WorkManager.getInstance(getApplicationContext()).enqueueUniquePeriodicWork(
                 "daily_check",
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 priceCheckDaily
         );
         WorkManager.getInstance(getApplicationContext()).enqueueUniquePeriodicWork(

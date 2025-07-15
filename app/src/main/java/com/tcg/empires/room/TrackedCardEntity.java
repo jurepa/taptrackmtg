@@ -17,6 +17,15 @@ public class TrackedCardEntity {
     @NonNull
     private String cardId;
 
+    @NonNull
+    private String cardName;
+
+    @NonNull
+    private String setName;
+
+    @NonNull
+    private String imageUrl;
+
     private int period;
 
     @NonNull
@@ -27,6 +36,34 @@ public class TrackedCardEntity {
 
     @NonNull
     private String symbol;
+
+
+    @NonNull
+    public String getCardName() {
+        return cardName;
+    }
+
+    public void setCardName(@NonNull String cardName) {
+        this.cardName = cardName;
+    }
+
+    @NonNull
+    public String getSetName() {
+        return setName;
+    }
+
+    public void setSetName(@NonNull String setName) {
+        this.setName = setName;
+    }
+
+    @NonNull
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(@NonNull String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     @NonNull
     public String getCardId() {

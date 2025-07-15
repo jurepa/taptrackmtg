@@ -91,15 +91,18 @@ public class PriceCheckWorker extends Worker {
             if(card != null ){
                 TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
                 trackedCardEntity.setCardId(card.getId());
+                trackedCardEntity.setImageUrl(card.getImageUris().getSmall());
                 trackedCardEntity.setPeriod(period);
+                trackedCardEntity.setCardName(card.getName());
+                trackedCardEntity.setSetName(card.getSetName());
                 if(lastTrackedEntity.getSymbol().equals("$") && (card.getPrices().getUsd() != null && !card.getPrices().getUsd().isEmpty())
                         || (lastTrackedEntity.isFoil() && card.getPrices().getUsdFoil() != null && !card.getPrices().getUsdFoil().isEmpty())) {
-                    trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getEur()) : Double.parseDouble(card.getPrices().getEurFoil()));
+                    trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getUsd()) : Double.parseDouble(card.getPrices().getUsdFoil()));
                     trackedCardEntity.setSymbol("$");
                     trackedCardRepository.insert(trackedCardEntity);
                 }else if(lastTrackedEntity.getSymbol().equals("€") && (card.getPrices().getEur() != null && !card.getPrices().getEur().isEmpty())
                         || (lastTrackedEntity.isFoil() && card.getPrices().getEurFoil() != null && !card.getPrices().getEurFoil().isEmpty())){
-                    trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getUsd()) : Double.parseDouble(card.getPrices().getUsdFoil()));
+                    trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getEur()) : Double.parseDouble(card.getPrices().getEurFoil()));
                     trackedCardEntity.setSymbol("€");
                     trackedCardRepository.insert(trackedCardEntity);
                 } else if(card.getFrameEffects() != null && card.getFrameEffects().contains("etched") && !card.getPrices().getUsdEtched().isEmpty()) {

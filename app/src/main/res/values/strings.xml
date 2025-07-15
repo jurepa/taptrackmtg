@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Empires</string>
+    <string name="app_name">TaptrackMtg</string>
     <string name="buscar">Buscar</string>
     <string name="sets">Sets</string>
     <string name="_6h">6h</string>
@@ -20,4 +20,5 @@
     <string name="how_often">How often?</string>
     <string name="check_price">Track price?</string>
     <string name="foil">Foil</string>
+    <string name="your_tracked_cards">Your tracked cards</string>
 </resources>

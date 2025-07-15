@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_trackedcards" android:title="@string/your_tracked_cards" android:icon="@android:drawable/ic_dialog_alert"/>
     <item android:id="@+id/nav_pricetracking" android:title="@string/pricetracking" android:icon="@android:drawable/ic_menu_view"/>
     <item android:id="@+id/nav_lifetap" android:title="@string/lifetap" android:icon="@android:drawable/ic_menu_preferences"/>
 </menu>
