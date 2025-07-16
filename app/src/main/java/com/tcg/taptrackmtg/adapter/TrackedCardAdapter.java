@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,17 +20,52 @@ import com.squareup.picasso.Picasso;
 import com.tcg.taptrackmtg.R;
 import com.tcg.taptrackmtg.room.TrackedCardEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class TrackedCardAdapter extends RecyclerView.Adapter<TrackedCardAdapter.ViewHolder> {
+public class TrackedCardAdapter extends RecyclerView.Adapter<TrackedCardAdapter.ViewHolder> implements Filterable {
 
 
     private final Context context;
     private List<TrackedCardEntity> trackedCards;
 
+    private final List<TrackedCardEntity> allTrackedCards;  // Lista completa (no se modifica)
+
     public TrackedCardAdapter(Context context, List<TrackedCardEntity> list) {
         this.context = context;
-        this.trackedCards = list;
+        this.trackedCards = new ArrayList<>(list);
+        this.allTrackedCards = new ArrayList<>(list);
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                List<TrackedCardEntity> filteredList = new ArrayList<>();
+                if (constraint == null || constraint.length() == 0) {
+                    filteredList.addAll(allTrackedCards);
+                } else {
+                    String filterPattern = constraint.toString().toLowerCase().trim();
+                    for (TrackedCardEntity card : allTrackedCards) {
+                        if (card.getCardName().toLowerCase().contains(filterPattern)) {
+                            filteredList.add(card);
+                        }
+                    }
+                }
+
+                FilterResults results = new FilterResults();
+                results.values = filteredList;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                trackedCards.clear();
+                trackedCards.addAll((List) results.values);
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

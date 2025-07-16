@@ -69,7 +69,8 @@ public class TrackedCardsFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                return false;
+                trackedCardAdapter.getFilter().filter(newText);
+                return true;
             }
         });
         return v;
