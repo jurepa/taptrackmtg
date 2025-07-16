@@ -1,13 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.tcg.empires"
+    namespace = "com.tcg.taptrackmtg"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.tcg.empires"
+        applicationId = "com.tcg.taptrackmtg"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -29,6 +30,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildFeatures {
+        viewBinding = true
+        compose = true
+    }
 }
 
 dependencies {
@@ -42,6 +47,8 @@ dependencies {
     implementation(libs.picasso)
     implementation(libs.room)
     implementation(libs.work)
+    implementation(platform(libs.firebaseBom))
+    implementation(libs.firebaseAuth)
     annotationProcessor(libs.roomAnnotation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

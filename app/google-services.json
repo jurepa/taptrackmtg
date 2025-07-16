@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "647583372019",
+    "project_id": "taptrackmtg",
+    "storage_bucket": "taptrackmtg.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:647583372019:android:094b929d5dfd132333dd86",
+        "android_client_info": {
+          "package_name": "com.tcg.taptrackmtg"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "647583372019-2kjaf4bml1h8orj7oim03mlrspg34tdh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tcg.taptrackmtg",
+            "certificate_hash": "87dae8ffbd4627ee616be780efd94e558f354809"
+          }
+        },
+        {
+          "client_id": "647583372019-kp65fel6729fur39mtfr972co53imivr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbjQsy6R6I1YXEuXhpUkqDRacB0Zx-2Ds"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "647583372019-kp65fel6729fur39mtfr972co53imivr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

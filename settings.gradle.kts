@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Empires"
+rootProject.name = "taptrackmtg"
 include(":app")

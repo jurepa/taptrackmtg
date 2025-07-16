@@ -3,4 +3,9 @@
     <item android:id="@+id/nav_trackedcards" android:title="@string/your_tracked_cards" android:icon="@android:drawable/ic_dialog_alert"/>
     <item android:id="@+id/nav_pricetracking" android:title="@string/pricetracking" android:icon="@android:drawable/ic_menu_view"/>
     <item android:id="@+id/nav_lifetap" android:title="@string/lifetap" android:icon="@android:drawable/ic_menu_preferences"/>
+    <!-- Separador visual -->
+    <group android:id="@+id/group_main">
+        <item android:title=" " />
+    </group>
+    <item android:id="@+id/nav_logout" android:title="@string/logout" android:icon="@android:drawable/ic_menu_close_clear_cancel" android:orderInCategory="100"/>
 </menu>

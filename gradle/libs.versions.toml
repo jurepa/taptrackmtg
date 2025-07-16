@@ -10,7 +10,9 @@ constraintlayout = "2.2.1"
 retrofit = "2.9.0"
 picasso = "2.8"
 room = "2.7.2"
-work = "2.9.0"
+work = "2.10.2"
+firebaseBom = "33.16.0"
+
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -26,6 +28,8 @@ picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
 room = {module="androidx.room:room-runtime", version.ref="room"}
 roomAnnotation = {module="androidx.room:room-compiler", version.ref="room"}
 work = {module ="androidx.work:work-runtime", version.ref="work"}
+firebaseBom = {module="com.google.firebase:firebase-bom", version.ref="firebaseBom"}
+firebaseAuth = {module = "com.google.firebase:firebase-auth"}
 
 
 

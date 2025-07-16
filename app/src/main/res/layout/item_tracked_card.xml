@@ -31,9 +31,9 @@
                 android:id="@+id/glowOverlayAdapter"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/glow_effect"
+                android:src="@drawable/glow_effect"
                 android:scaleType="fitXY"
-                android:visibility="gone" />
+                android:visibility="invisible" />
         </FrameLayout>
 
         <LinearLayout
