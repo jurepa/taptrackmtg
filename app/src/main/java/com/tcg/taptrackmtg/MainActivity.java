@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -31,6 +32,7 @@ import androidx.work.WorkManager;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.PicassoProvider;
 import com.tcg.taptrackmtg.fragment.LifetapFragment;
 import com.tcg.taptrackmtg.fragment.TrackedCardsFragment;
 import com.tcg.taptrackmtg.fragment.TrackingFragment;
@@ -73,8 +75,13 @@ public class MainActivity extends AppCompatActivity {
         drawerToggle.syncState();
 
         enqueuePriceCheckWorks();
-        Picasso.setSingletonInstance(new Picasso.Builder(getApplicationContext()).build());
 
+        try {
+            Picasso.setSingletonInstance(new Picasso.Builder(getApplicationContext()).build());
+        } catch (IllegalStateException e) {
+            // Ya estaba instanciado, no pasa nada
+            Log.w("Picasso", "Singleton instance already set, skipping.");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
