@@ -40,23 +40,27 @@ public class TrackedCardRepository {
         });
     }
 
-    public void stopTrackingByCardId(String cardId) {
+    public void stopTrackingByCardId(String cardId, String userId) {
         executor.execute(() -> {
-            trackedCardDao.stopTrackingByCardID(cardId);
+            trackedCardDao.stopTrackingByCardIDAndUserId(cardId, userId);
         });
     }
 
-    public void getTrackedCards(Consumer<List<TrackedCardEntity>> callback) {
+    public void getTrackedCards(String userId, Consumer<List<TrackedCardEntity>> callback) {
         executor.execute(() -> {
-            List<TrackedCardEntity> result = trackedCardDao.getTrackedCards();
+            List<TrackedCardEntity> result = trackedCardDao.getTrackedCardsByUserId(userId);
             callback.accept(result);
         });
     }
 
-    public List<TrackedCardEntity> getTrackedCardsByPeriod(int period) {
+    public List<TrackedCardEntity> getTrackedCardsByPeriod(int period, String userId) {
 
-        return trackedCardDao.getTrackedCardsByPeriod(period);
+        return trackedCardDao.getTrackedCardsByPeriodAndUserId(period, userId);
 
+    }
+
+    public List<TrackedCardEntity> getAllCards(){
+        return trackedCardDao.getAllCards();
     }
 
 

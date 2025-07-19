@@ -61,8 +61,8 @@ public class CardDetailViewModel extends AndroidViewModel {
         repository.getByCardId(cardId, callback);
     }
 
-    public void stopTrackingByCardId(String cardId) {
-        repository.stopTrackingByCardId(cardId);
+    public void stopTrackingByCardId(String cardId, String userId) {
+        repository.stopTrackingByCardId(cardId, userId);
     }
     public void searchCards(String query){
         ScryfallService scryfallService = ScryfallClient.getScryfallService();

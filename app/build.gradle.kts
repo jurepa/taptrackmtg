@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.work)
     implementation(platform(libs.firebaseBom))
     implementation(libs.firebaseAuth)
+    implementation(libs.firebaseFirestore)
+    implementation(libs.guava)
     annotationProcessor(libs.roomAnnotation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

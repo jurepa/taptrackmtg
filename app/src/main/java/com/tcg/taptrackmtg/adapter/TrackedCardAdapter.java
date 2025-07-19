@@ -142,4 +142,13 @@ public class TrackedCardAdapter extends RecyclerView.Adapter<TrackedCardAdapter.
     public int getItemCount() {
         return trackedCards.size();
     }
+
+    public TrackedCardEntity getItemAt(int position){
+        return trackedCards.get(position);
+    }
+
+    public void removeItem(int position) {
+        trackedCards.remove(position);
+        notifyItemRemoved(position);
+    }
 }

@@ -27,12 +27,16 @@ public class TrackedCardsViewModel extends AndroidViewModel {
         return trackedCards;
     }
 
-    public void getUserTrackedCards(){
-        repository.getTrackedCards(new Consumer<>() {
+    public void getUserTrackedCards(String userId){
+        repository.getTrackedCards(userId, new Consumer<>() {
             @Override
             public void accept(List<TrackedCardEntity> trackedCardEntities) {
                 trackedCards.postValue(trackedCardEntities);
             }
         });
+    }
+
+    public void removeTrackedCardById(String cardId, String userId){
+        repository.stopTrackingByCardId(cardId, userId);
     }
 }

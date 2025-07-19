@@ -71,12 +71,12 @@ public class PriceCheckWorker extends Worker {
 
         try{
             if(period == 3){
-                trackPricesAndNotify(period, builder);
+                trackPricesAndNotify(period, builder, user);
             }else if(period == 4 && (now - lastWeeklyRun >= oneWeekInMillis)){
-                trackPricesAndNotify(period, builder);
+                trackPricesAndNotify(period, builder, user);
                 prefs.edit().putLong("last_weekly_check", now).apply();
             }else if(period == 5 && (now - lastMonthlyRun >= oneMonthInMillis)){
-                trackPricesAndNotify(period, builder);
+                trackPricesAndNotify(period, builder, user);
                 prefs.edit().putLong("last_monthly_check", now).apply();
             }
         }catch (IOException e){
@@ -86,10 +86,10 @@ public class PriceCheckWorker extends Worker {
         return Result.success(); // o retry() o failure()
     }
 
-    private void trackPricesAndNotify(int period, NotificationCompat.Builder builder) throws IOException {
+    private void trackPricesAndNotify(int period, NotificationCompat.Builder builder, FirebaseUser user) throws IOException {
 
         TrackedCardRepository trackedCardRepository = new TrackedCardRepository((Application) getApplicationContext());
-        List<TrackedCardEntity> trackedCardsByPeriod = trackedCardRepository.getTrackedCardsByPeriod(period);
+        List<TrackedCardEntity> trackedCardsByPeriod = trackedCardRepository.getTrackedCardsByPeriod(period, user.getUid());
 
 
         for(TrackedCardEntity lastTrackedEntity : trackedCardsByPeriod) {
@@ -103,12 +103,13 @@ public class PriceCheckWorker extends Worker {
                 trackedCardEntity.setPeriod(period);
                 trackedCardEntity.setCardName(card.getName());
                 trackedCardEntity.setSetName(card.getSetName());
-                if(lastTrackedEntity.getSymbol().equals("$") && (card.getPrices().getUsd() != null && !card.getPrices().getUsd().isEmpty())
+                trackedCardEntity.setUserId(user.getUid());
+                if(lastTrackedEntity.getSymbol().equals("$") && (!lastTrackedEntity.isFoil() && card.getPrices().getUsd() != null && !card.getPrices().getUsd().isEmpty())
                         || (lastTrackedEntity.isFoil() && card.getPrices().getUsdFoil() != null && !card.getPrices().getUsdFoil().isEmpty())) {
                     trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getUsd()) : Double.parseDouble(card.getPrices().getUsdFoil()));
                     trackedCardEntity.setSymbol("$");
                     trackedCardRepository.insert(trackedCardEntity);
-                }else if(lastTrackedEntity.getSymbol().equals("€") && (card.getPrices().getEur() != null && !card.getPrices().getEur().isEmpty())
+                }else if(lastTrackedEntity.getSymbol().equals("€") && (!lastTrackedEntity.isFoil() && card.getPrices().getEur() != null && !card.getPrices().getEur().isEmpty())
                         || (lastTrackedEntity.isFoil() && card.getPrices().getEurFoil() != null && !card.getPrices().getEurFoil().isEmpty())){
                     trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getEur()) : Double.parseDouble(card.getPrices().getEurFoil()));
                     trackedCardEntity.setSymbol("€");

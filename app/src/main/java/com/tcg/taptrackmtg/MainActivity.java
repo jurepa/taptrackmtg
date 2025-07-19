@@ -31,6 +31,7 @@ import androidx.work.WorkManager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.PicassoProvider;
 import com.tcg.taptrackmtg.fragment.LifetapFragment;
@@ -47,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private ActionBarDrawerToggle drawerToggle;
 
+    private FirebaseUser currentUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,9 +61,13 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null){
+            currentUser = (FirebaseUser) bundle.getParcelable("user");
+        }
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, TrackingFragment.newInstance())
+                    .replace(R.id.fragmentContainer, TrackingFragment.newInstance(currentUser))
                     .commitNow();
         }
 
@@ -98,12 +105,12 @@ public class MainActivity extends AppCompatActivity {
             int itemId = item.getItemId();
 
             if (itemId == R.id.nav_pricetracking) {
-                fragment = TrackingFragment.newInstance();
+                fragment = TrackingFragment.newInstance(currentUser);
             } else if (itemId == R.id.nav_lifetap) {
                 Toast.makeText(this, "Lifetap", Toast.LENGTH_SHORT).show();
                 fragment = LifetapFragment.newInstance();
             } else if (itemId == R.id.nav_trackedcards) {
-                fragment = TrackedCardsFragment.newInstance();
+                fragment = TrackedCardsFragment.newInstance(currentUser);
             }else {
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);

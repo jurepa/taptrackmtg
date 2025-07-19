@@ -30,6 +30,8 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 import com.tcg.taptrackmtg.R;
 import com.tcg.taptrackmtg.adapter.SetsAdapter;
@@ -67,8 +69,15 @@ public class TrackingFragment extends Fragment {
     private ArrayAdapter<String> cartas;
     private List<String> cardNames = new ArrayList<>();
 
-    public static TrackingFragment newInstance() {
-        return new TrackingFragment();
+    private FirebaseUser currentUser;
+
+    public static TrackingFragment newInstance(FirebaseUser currentUser) {
+        return new TrackingFragment(currentUser);
+    }
+
+    private TrackingFragment(FirebaseUser currentUser){
+        super();
+        this.currentUser = currentUser;
     }
 
     @Override
@@ -289,7 +298,7 @@ public class TrackingFragment extends Fragment {
 
                    requireActivity().runOnUiThread(() -> {
                        if (trackedCardEntities != null && !trackedCardEntities.isEmpty()) {
-                           cardDetailViewModel.stopTrackingByCardId(trackedCardEntities.get(0).getCardId());
+                           cardDetailViewModel.stopTrackingByCardId(trackedCardEntities.get(0).getCardId(), currentUser.getUid());
                            checkPrice.setChecked(false);
                            oftenGroup.clearCheck();
                            confirmTrackButton.setText(R.string.track_price);
@@ -317,7 +326,8 @@ public class TrackingFragment extends Fragment {
                            trackedCardEntity.setSetName(detailCard.getSetName());
                            trackedCardEntity.setPeriod(getPeriodNumber(radioButtonId));
                            trackedCardEntity.setFoil(foilSwitch.isChecked());
-                           if ((detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty())
+                           trackedCardEntity.setUserId(currentUser.getUid());
+                           if ((!foilSwitch.isChecked() && detailCard.getPrices().getEur() != null && !detailCard.getPrices().getEur().isEmpty())
                            || (foilSwitch.isChecked() && detailCard.getPrices().getEurFoil() != null && !detailCard.getPrices().getEurFoil().isEmpty())) {
                                trackedCardEntity.setLastKnownPrice(!foilSwitch.isChecked() ? Double.parseDouble(detailCard.getPrices().getEur()) : Double.parseDouble(detailCard.getPrices().getEurFoil()));
                                trackedCardEntity.setSymbol("€");
@@ -329,7 +339,7 @@ public class TrackingFragment extends Fragment {
                                }
                                checkPrice.setEnabled(false);
                                foilSwitch.setEnabled(false);
-                           } else if ((detailCard.getPrices().getUsd() != null && !detailCard.getPrices().getUsd().isEmpty())
+                           } else if ((!foilSwitch.isChecked() && detailCard.getPrices().getUsd() != null && !detailCard.getPrices().getUsd().isEmpty())
                            || (foilSwitch.isChecked() && detailCard.getPrices().getUsdFoil() != null && !detailCard.getPrices().getUsdFoil().isEmpty())) {
                                trackedCardEntity.setLastKnownPrice(!foilSwitch.isChecked() ? Double.parseDouble(detailCard.getPrices().getUsd()) : Double.parseDouble(detailCard.getPrices().getUsdFoil()));
                                trackedCardEntity.setSymbol("$");

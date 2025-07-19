@@ -14,6 +14,9 @@ public class TrackedCardEntity {
     private Integer id;
 
     @NonNull
+    private String userId;
+
+    @NonNull
     private String cardId;
 
     @NonNull
@@ -36,6 +39,14 @@ public class TrackedCardEntity {
     @NonNull
     private String symbol;
 
+    @NonNull
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(@NonNull String userId) {
+        this.userId = userId;
+    }
 
     @NonNull
     public String getCardName() {

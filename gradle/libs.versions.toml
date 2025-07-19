@@ -12,6 +12,7 @@ picasso = "2.8"
 room = "2.7.2"
 work = "2.10.2"
 firebaseBom = "33.16.0"
+guava = '31.1-android'
 
 
 [libraries]
@@ -30,6 +31,8 @@ roomAnnotation = {module="androidx.room:room-compiler", version.ref="room"}
 work = {module ="androidx.work:work-runtime", version.ref="work"}
 firebaseBom = {module="com.google.firebase:firebase-bom", version.ref="firebaseBom"}
 firebaseAuth = {module = "com.google.firebase:firebase-auth"}
+firebaseFirestore = {module = "com.google.firebase:firebase-firestore"}
+guava = {module = "com.google.guava:guava", version.ref = "guava"}
 
 
 
