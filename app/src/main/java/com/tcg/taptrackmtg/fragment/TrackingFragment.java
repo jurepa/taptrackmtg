@@ -191,7 +191,7 @@ public class TrackingFragment extends Fragment {
                 cardName.setText(String.format("Card name: %s", setSelected.getName()));
                 cardText.setText(String.format("Card text: %s", setSelected.getOracleText()));
                 typeLine.setText(String.format("Type line: %s", setSelected.getTypeLine()));
-                cardDetailViewModel.getByCardId(setSelected.getId(), new Consumer<List<TrackedCardEntity>>() {
+                cardDetailViewModel.getByCardId(currentUser.getUid(), setSelected.getId(), new Consumer<List<TrackedCardEntity>>() {
                     @Override
                     public void accept(List<TrackedCardEntity> trackedCardEntities) {
                         requireActivity().runOnUiThread(() ->{
@@ -292,7 +292,7 @@ public class TrackingFragment extends Fragment {
         confirmTrackButton.setOnClickListener(v -> {
            int radioButtonId = oftenGroup.getCheckedChipId();
            ScryfallDetailCard detailCard = (ScryfallDetailCard) setsDropdown.getSelectedItem();
-           cardDetailViewModel.getByCardId(detailCard.getId(), new Consumer<>() {
+           cardDetailViewModel.getByCardId(currentUser.getUid(), detailCard.getId(), new Consumer<>() {
                @Override
                public void accept(List<TrackedCardEntity> trackedCardEntities) {
 

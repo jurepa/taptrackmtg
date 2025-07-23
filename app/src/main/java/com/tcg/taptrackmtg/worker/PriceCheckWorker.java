@@ -22,6 +22,9 @@ import androidx.work.WorkerParameters;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.tcg.taptrackmtg.R;
 import com.tcg.taptrackmtg.client.ScryfallClient;
 import com.tcg.taptrackmtg.model.ScryfallDetailCard;
@@ -30,11 +33,20 @@ import com.tcg.taptrackmtg.room.TrackedCardEntity;
 import com.tcg.taptrackmtg.service.ScryfallService;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PriceCheckWorker extends Worker {
+
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final CollectionReference cardsRef = db.collection("trackedCards");
 
     public PriceCheckWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
@@ -88,43 +100,78 @@ public class PriceCheckWorker extends Worker {
 
     private void trackPricesAndNotify(int period, NotificationCompat.Builder builder, FirebaseUser user) throws IOException {
 
-        TrackedCardRepository trackedCardRepository = new TrackedCardRepository((Application) getApplicationContext());
-        List<TrackedCardEntity> trackedCardsByPeriod = trackedCardRepository.getTrackedCardsByPeriod(period, user.getUid());
+        TrackedCardRepository trackedCardRepository = new TrackedCardRepository();
 
 
-        for(TrackedCardEntity lastTrackedEntity : trackedCardsByPeriod) {
-            ScryfallService scryfallService = ScryfallClient.getScryfallService();
-            Response<ScryfallDetailCard> response = scryfallService.searchCardsSyncById(lastTrackedEntity.getCardId()).execute();
-            ScryfallDetailCard card = response.body();
-            if(card != null ){
-                TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
-                trackedCardEntity.setCardId(card.getId());
-                trackedCardEntity.setImageUrl(card.getImageUris().getSmall());
-                trackedCardEntity.setPeriod(period);
-                trackedCardEntity.setCardName(card.getName());
-                trackedCardEntity.setSetName(card.getSetName());
-                trackedCardEntity.setUserId(user.getUid());
-                if(lastTrackedEntity.getSymbol().equals("$") && (!lastTrackedEntity.isFoil() && card.getPrices().getUsd() != null && !card.getPrices().getUsd().isEmpty())
-                        || (lastTrackedEntity.isFoil() && card.getPrices().getUsdFoil() != null && !card.getPrices().getUsdFoil().isEmpty())) {
-                    trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getUsd()) : Double.parseDouble(card.getPrices().getUsdFoil()));
-                    trackedCardEntity.setSymbol("$");
-                    trackedCardRepository.insert(trackedCardEntity);
-                }else if(lastTrackedEntity.getSymbol().equals("€") && (!lastTrackedEntity.isFoil() && card.getPrices().getEur() != null && !card.getPrices().getEur().isEmpty())
-                        || (lastTrackedEntity.isFoil() && card.getPrices().getEurFoil() != null && !card.getPrices().getEurFoil().isEmpty())){
-                    trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getEur()) : Double.parseDouble(card.getPrices().getEurFoil()));
-                    trackedCardEntity.setSymbol("€");
-                    trackedCardRepository.insert(trackedCardEntity);
-                } else if(card.getFrameEffects() != null && card.getFrameEffects().contains("etched") && !card.getPrices().getUsdEtched().isEmpty()) {
-                    trackedCardEntity.setLastKnownPrice(Double.parseDouble(card.getPrices().getUsdEtched()));
-                    trackedCardEntity.setSymbol("$");
-                    trackedCardRepository.insert(trackedCardEntity);
-                }
+        cardsRef
+                .whereEqualTo("userId", user.getUid())
+                .whereEqualTo("period", period)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    Map<String, TrackedCardEntity> latestByCardId = new HashMap<>();
+                    for (DocumentSnapshot doc : snapshot) {
+                        TrackedCardEntity card = doc.toObject(TrackedCardEntity.class);
+                        if (card != null) {
+                            String cardId = card.getCardId();
+                            TrackedCardEntity existing = latestByCardId.get(cardId);
+                            if (existing == null || card.getId() > existing.getId()) {
+                                latestByCardId.put(cardId, card);
+                            }
+                        }
+                    }
 
-                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                    notify(trackedCardEntity, card, builder);
-                }
-            }
-        }
+                    for(TrackedCardEntity lastTrackedEntity : latestByCardId.values()) {
+                        ScryfallService scryfallService = ScryfallClient.getScryfallService();
+                        Call<ScryfallDetailCard> response = null;
+
+                        response = scryfallService.searchCardsSyncById(lastTrackedEntity.getCardId());
+
+                        response.enqueue(new Callback<ScryfallDetailCard>() {
+                            @Override
+                            public void onResponse(Call<ScryfallDetailCard> call, Response<ScryfallDetailCard> response) {
+                                ScryfallDetailCard card = response.body();
+                                if(card != null ){
+                                    TrackedCardEntity trackedCardEntity = new TrackedCardEntity();
+                                    trackedCardEntity.setCardId(card.getId());
+                                    trackedCardEntity.setImageUrl(card.getImageUris().getSmall());
+                                    trackedCardEntity.setPeriod(period);
+                                    trackedCardEntity.setCardName(card.getName());
+                                    trackedCardEntity.setSetName(card.getSetName());
+                                    trackedCardEntity.setUserId(user.getUid());
+                                    if(lastTrackedEntity.getSymbol().equals("$") && (!lastTrackedEntity.isFoil() && card.getPrices().getUsd() != null && !card.getPrices().getUsd().isEmpty())
+                                            || (lastTrackedEntity.isFoil() && card.getPrices().getUsdFoil() != null && !card.getPrices().getUsdFoil().isEmpty())) {
+                                        trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getUsd()) : Double.parseDouble(card.getPrices().getUsdFoil()));
+                                        trackedCardEntity.setSymbol("$");
+                                        trackedCardRepository.insert(trackedCardEntity);
+                                    }else if(lastTrackedEntity.getSymbol().equals("€") && (!lastTrackedEntity.isFoil() && card.getPrices().getEur() != null && !card.getPrices().getEur().isEmpty())
+                                            || (lastTrackedEntity.isFoil() && card.getPrices().getEurFoil() != null && !card.getPrices().getEurFoil().isEmpty())){
+                                        trackedCardEntity.setLastKnownPrice(!lastTrackedEntity.isFoil() ? Double.parseDouble(card.getPrices().getEur()) : Double.parseDouble(card.getPrices().getEurFoil()));
+                                        trackedCardEntity.setSymbol("€");
+                                        trackedCardRepository.insert(trackedCardEntity);
+                                    } else if(card.getFrameEffects() != null && card.getFrameEffects().contains("etched") && !card.getPrices().getUsdEtched().isEmpty()) {
+                                        trackedCardEntity.setLastKnownPrice(Double.parseDouble(card.getPrices().getUsdEtched()));
+                                        trackedCardEntity.setSymbol("$");
+                                        trackedCardRepository.insert(trackedCardEntity);
+                                    }
+
+                                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                                        PriceCheckWorker.this.notify(trackedCardEntity, card, builder);
+                                    }
+
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ScryfallDetailCard> call, Throwable t) {
+
+                            }
+                        });
+
+                    }
+
+
+                });
+
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)

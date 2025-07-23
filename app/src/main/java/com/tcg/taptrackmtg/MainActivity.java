@@ -33,7 +33,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.PicassoProvider;
 import com.tcg.taptrackmtg.fragment.LifetapFragment;
 import com.tcg.taptrackmtg.fragment.TrackedCardsFragment;
 import com.tcg.taptrackmtg.fragment.TrackingFragment;
@@ -139,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         PeriodicWorkRequest priceCheckDaily = new PeriodicWorkRequest.Builder(PriceCheckWorker.class, 1, TimeUnit.DAYS).setInputData(new Data.Builder().putInt("period",3).build()).setConstraints(internetRequired).build();
         PeriodicWorkRequest priceCheckWeekly = new PeriodicWorkRequest.Builder(PriceCheckWorker.class, 1, TimeUnit.DAYS).setInputData(new Data.Builder().putInt("period",4).build()).setConstraints(internetRequired).build();
         PeriodicWorkRequest priceCheckMonthly = new PeriodicWorkRequest.Builder(PriceCheckWorker.class, 1, TimeUnit.DAYS).setInputData(new Data.Builder().putInt("period",5).build()).setConstraints(internetRequired).build();
+
 
         WorkManager.getInstance(getApplicationContext()).enqueueUniquePeriodicWork(
                 "daily_check",

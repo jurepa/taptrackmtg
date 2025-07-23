@@ -20,7 +20,7 @@ public class TrackedCardsViewModel extends AndroidViewModel {
 
     public TrackedCardsViewModel(@NonNull Application application) {
         super(application);
-        repository = new TrackedCardRepository(application);
+        repository = new TrackedCardRepository();
     }
 
     public MutableLiveData<List<TrackedCardEntity>> getTrackedCards() {

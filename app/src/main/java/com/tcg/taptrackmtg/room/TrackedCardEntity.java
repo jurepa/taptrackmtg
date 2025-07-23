@@ -6,11 +6,8 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 
-@Entity(tableName = "trackedCards", indices = {@Index(value = {"cardId"})})
 public class TrackedCardEntity {
 
-    @PrimaryKey(autoGenerate = true)
-    @NonNull
     private Integer id;
 
     @NonNull

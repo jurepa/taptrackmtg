@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.firebaseAuth)
     implementation(libs.firebaseFirestore)
     implementation(libs.guava)
+    implementation("androidx.concurrent:concurrent-futures:1.1.0")
     annotationProcessor(libs.roomAnnotation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

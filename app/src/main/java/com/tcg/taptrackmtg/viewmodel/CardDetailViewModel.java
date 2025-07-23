@@ -46,19 +46,15 @@ public class CardDetailViewModel extends AndroidViewModel {
 
     public CardDetailViewModel(@NonNull Application application) {
         super(application);
-        repository = new TrackedCardRepository(application);
+        repository = new TrackedCardRepository();
     }
 
     public void insertCard(TrackedCardEntity card) {
         repository.insert(card);
     }
 
-    public void getCardById(int id, Consumer<TrackedCardEntity> callback) {
-        repository.getById(id, callback);
-    }
-
-    public void getByCardId(String cardId, Consumer<List<TrackedCardEntity>> callback) {
-        repository.getByCardId(cardId, callback);
+    public void getByCardId(String userId, String cardId, Consumer<List<TrackedCardEntity>> callback) {
+        repository.getByCardId(userId, cardId, callback);
     }
 
     public void stopTrackingByCardId(String cardId, String userId) {
@@ -117,7 +113,7 @@ public class CardDetailViewModel extends AndroidViewModel {
 
             @Override
             public void onFailure(Call<ScryfallDetailCard> call, Throwable t) {
-                cards.postValue(null); // o null, según prefieras
+                cards.postValue(null);
             }
         });
     }
